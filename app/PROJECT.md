@@ -2,9 +2,9 @@
 
 ## Estado
 
-Versión: v0.2.6
+**Versión:** v0.3.5-alpha
 
-Estado: 🟢 En desarrollo
+**Estado:** 🟢 Desarrollo activo
 
 ---
 
@@ -14,149 +14,129 @@ Estado: 🟢 En desarrollo
 - React 19
 - TypeScript
 - TailwindCSS
-- shadcn/ui
+- Base UI
 - Supabase
 - Supabase Storage
+- React Hook Form
+- Zod
 
 ---
 
 # Arquitectura
 
-/app
-/components
-/hooks
-/lib
-/services
+```
+app/
+components/
+features/
+hooks/
+lib/
+services/
+public/
+```
+
+Todo código nuevo deberá vivir dentro de `features`.
 
 ---
 
-# Funcionalidades
+# Módulos
 
-## Autenticación
+## Auth
 
-- [x] Login
-- [ ] Registro
-- [ ] Recuperar contraseña
+- ✅ Login
 
 ---
 
-## Equipos
+## Teams
 
-- [x] CRUD
-- [x] Perfil
-- [x] Logo
-- [ ] Banner
-- [ ] Editar
-- [ ] Miembros
-- [ ] Roles
-- [ ] Invitaciones
+- ✅ CRUD
+- ✅ Perfil
+- ✅ Editar
+- ✅ Logo
+- ✅ Banner
+- ✅ Team Header
 
 ---
 
-## Torneos
+## Players
 
-- [x] CRUD
-- [ ] Inscripciones
-- [ ] Brackets
-- [ ] Fixture
-- [ ] Resultados
-
----
-
-## Partidos
-
-- [ ] Crear
-- [ ] Reportar
-- [ ] Confirmar
-- [ ] Historial
+- ✅ CRUD
+- ✅ Perfil
+- ✅ Avatar
+- ✅ Editar
+- ✅ Eliminar
+- ✅ Upload Avatar
 
 ---
 
-## Social
+## Tournaments
 
-- [ ] Perfil público
-- [ ] Seguidores
-- [ ] Feed
-- [ ] Chat
-- [ ] Notificaciones
+- ✅ CRUD
+- ✅ TournamentService
+- ✅ Tournament Registration Base
+- 🚧 Register Teams
+- ⬜ Fixtures
+- ⬜ Standings
+- ⬜ Brackets
+
+---
+
+## Matches
+
+- ✅ MatchService
+- ⬜ Match Center
+- ⬜ Live
+- ⬜ Results
 
 ---
 
 # Servicios
 
-- TeamService
-- TournamentService
-- MatchService
-- PlayerService
-- TeamStorageService
+- ✅ TeamService
+- ✅ PlayerService
+- ✅ TournamentService
+- ✅ MatchService
+- ✅ TeamStorageService
+
+---
+
+# Storage
+
+- ✅ team-logos
+- ✅ team-banners
+- ✅ player-avatars
 
 ---
 
 # Base de datos
 
-Supabase
-
-Storage
-
-Bucket:
-
-team-logos
+- ✅ teams
+- ✅ players
+- ✅ tournaments
+- ✅ tournament_teams
 
 ---
 
 # Próximo Sprint
 
-v0.2.6
+## ASL-020
 
-Sprint 1
-
-- TeamHeader
-- Banner
-- Upload Banner
+- Register Team
+- Tournament Teams
+- Fixtures Generator
 
 ---
 
-# Convenciones
+# Reglas
 
-Cada sprint incluye:
-
-1. Comandos
-2. SQL
-3. Archivos completos
-4. Pruebas
-5. Commit
-
-Nunca modificar más de 3 archivos por sprint.
-
-Todo debe quedar funcionando antes de continuar.
+- Un archivo por sprint.
+- Proyecto siempre compilando.
+- Sin código duplicado.
+- Componentes reutilizables.
+- Servicios desacoplados.
+- No lógica de negocio en páginas.
 
 ---
 
-# Roadmap
+# Objetivo
 
-v0.2.6
-Equipos
-
-v0.3
-Miembros
-
-v0.4
-Roles
-
-v0.5
-Brackets
-
-v0.6
-Matches
-
-v0.7
-Ranking
-
-v0.8
-Chat
-
-v0.9
-API
-
-v1.0
-Release
+Completar el **Tournament Engine** antes de comenzar estadísticas, rankings y organización de ligas.

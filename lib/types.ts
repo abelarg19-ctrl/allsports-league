@@ -154,4 +154,52 @@ export interface Match {
   status: string;
 
   starts_at: string | null;
+}// =======================================
+// PLAYER
+// =======================================
+
+export interface Player {
+  id: number;
+
+  team_id: number;
+
+  owner_id: string;
+
+  first_name: string;
+
+  last_name: string;
+
+  nickname: string | null;
+
+  avatar_url: string | null;
+
+  number: number | null;
+
+  position: string | null;
+
+  country: string | null;
+
+  city: string | null;
+
+  birth_date: string | null;
+
+  bio: string | null;
+
+  wins: number;
+
+  losses: number;
+
+  draws: number;
+
+  goals: number;
+
+  assists: number;
+
+  mvp: number;
+
+  elo: number;
+
+  is_active: boolean;
+
+  created_at: string;
 }

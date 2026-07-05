@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { Tournament } from "@/lib/types";
+import { Tournament, Team } from "@/lib/types";
 
 export class TournamentService {
   static async getAll(userId: string): Promise<Tournament[]> {
@@ -9,9 +9,7 @@ export class TournamentService {
       .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     return (data ?? []) as Tournament[];
   }
@@ -27,10 +25,52 @@ export class TournamentService {
       .eq("owner_id", userId)
       .single();
 
-    if (error) {
-      return null;
-    }
+    if (error) return null;
 
     return data as Tournament;
+  }
+
+  static async registerTeam(
+    tournamentId: number,
+    teamId: number
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("tournament_teams")
+      .insert({
+        tournament_id: tournamentId,
+        team_id: teamId,
+      });
+
+    if (error) throw error;
+  }
+
+  static async removeTeam(
+    tournamentId: number,
+    teamId: number
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("tournament_teams")
+      .delete()
+      .eq("tournament_id", tournamentId)
+      .eq("team_id", teamId);
+
+    if (error) throw error;
+  }
+
+  static async getRegisteredTeams(
+    tournamentId: number
+  ): Promise<Team[]> {
+    const { data, error } = await supabase
+      .from("tournament_teams")
+      .select(`
+        teams (*)
+      `)
+      .eq("tournament_id", tournamentId);
+
+    if (error) throw error;
+
+    return (data ?? []).map(
+      (row: any) => row.teams as Team
+    );
   }
 }

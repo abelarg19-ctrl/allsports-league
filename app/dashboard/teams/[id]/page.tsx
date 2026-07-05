@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -7,6 +6,7 @@ import { Team } from "@/lib/types";
 import { TeamService } from "@/services/team.service";
 
 import TeamHeader from "@/components/teams/TeamHeader";
+import TeamPlayersSection from "@/features/players/components/TeamPlayersSection";
 
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -39,20 +39,18 @@ export default function TeamProfilePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <TeamHeader
-  team={team}
-  onLogoUploaded={(logoUrl) =>
-    setTeam({
-      ...team,
-      logo_url: logoUrl,
-    })
-  }
-  onTeamUpdated={(updatedTeam) => setTeam(updatedTeam)}
-/>
+        team={team}
+        onLogoUploaded={(logoUrl) =>
+          setTeam({
+            ...team,
+            logo_url: logoUrl,
+          })
+        }
+        onTeamUpdated={(updatedTeam) => setTeam(updatedTeam)}
+      />
 
-      {/* Estadísticas */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="p-6">
             <p className="text-muted-foreground">Wins</p>
@@ -81,10 +79,11 @@ export default function TeamProfilePage() {
         </Card>
       </div>
 
-      {/* About */}
+      <TeamPlayersSection team={team} />
+
       <Card>
         <CardContent className="p-8">
-          <h2 className="text-2xl font-bold mb-4">About</h2>
+          <h2 className="mb-4 text-2xl font-bold">About</h2>
 
           <p className="text-muted-foreground">
             {team.description || "No description yet."}

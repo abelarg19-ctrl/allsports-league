@@ -14,11 +14,11 @@ export class TeamService {
     return (data ?? []) as Team[];
   }
 
-  static async create(team: Omit<Team, "id" | "created_at">) {
+  static async getById(id: number): Promise<Team> {
     const { data, error } = await supabase
       .from("teams")
-      .insert(team)
-      .select()
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) throw error;
@@ -26,11 +26,13 @@ export class TeamService {
     return data as Team;
   }
 
-  static async getById(id: number): Promise<Team> {
+  static async create(
+    team: Omit<Team, "id" | "created_at">
+  ): Promise<Team> {
     const { data, error } = await supabase
       .from("teams")
-      .select("*")
-      .eq("id", id)
+      .insert(team)
+      .select()
       .single();
 
     if (error) throw error;
@@ -61,5 +63,23 @@ export class TeamService {
       .eq("id", id);
 
     if (error) throw error;
+  }
+
+  static async exists(
+    ownerId: string,
+    name: string
+  ): Promise<boolean> {
+    const { count, error } = await supabase
+      .from("teams")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("owner_id", ownerId)
+      .ilike("name", name);
+
+    if (error) throw error;
+
+    return (count ?? 0) > 0;
   }
 }
