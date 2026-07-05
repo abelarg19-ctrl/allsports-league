@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
-export default function Tournaments() {
-  const [tournaments, setTournaments] = useState<any[]>([]);
+import { supabase } from "@/lib/supabase";
+import { Tournament } from "@/lib/types";
+import { TournamentService } from "@/services/tournament.service";
+
+export default function TournamentsPage() {
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,31 +16,23 @@ export default function Tournaments() {
   }, []);
 
   async function loadTournaments() {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!user) {
+      if (!user) return;
+
+      const data = await TournamentService.getAll(user.id);
+
+      setTournaments(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { data, error } = await supabase
-      .from("tournaments")
-      .select("*")
-      .eq("owner_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.log(error);
-      setLoading(false);
-      return;
-    }
-
-    setTournaments(data || []);
-    setLoading(false);
   }
 
   function getStatusColor(status: string) {
@@ -52,61 +47,56 @@ export default function Tournaments() {
   }
 
   return (
-    <div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold">
+          Tournaments
+        </h1>
 
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Tournaments</h1>
         <p className="text-gray-400">
           Manage your competitions
         </p>
       </div>
 
-      {/* LOADING */}
       {loading ? (
-        <p className="text-gray-400">Loading tournaments...</p>
+        <p className="text-gray-400">
+          Loading tournaments...
+        </p>
       ) : tournaments.length === 0 ? (
-        <div className="bg-gray-900 p-6 rounded-xl text-gray-400">
-          No tournaments yet. Create your first one ⚽
+        <div className="rounded-xl bg-gray-900 p-6 text-gray-400">
+          No tournaments yet.
         </div>
       ) : (
         <div className="grid gap-4">
-
-          {tournaments.map((t) => (
+          {tournaments.map((tournament) => (
             <Link
-              key={t.id}
-              href={`/dashboard/tournaments/${t.id}`}
-              className="bg-gray-900 hover:bg-gray-800 transition rounded-xl p-5 border border-gray-800"
+              key={tournament.id}
+              href={`/dashboard/tournaments/${tournament.id}`}
+              className="rounded-xl border border-gray-800 bg-gray-900 p-5 transition hover:bg-gray-800"
             >
-              <div className="flex justify-between items-center">
-
-                {/* LEFT */}
+              <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold">
-                    {t.name}
+                    {tournament.name}
                   </h2>
 
-                  <p className="text-gray-400 text-sm">
-                    {t.sport} • {t.format}
+                  <p className="text-sm text-gray-400">
+                    {tournament.sport} • {tournament.format}
                   </p>
                 </div>
 
-                {/* RIGHT */}
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                    t.status
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(
+                    tournament.status
                   )}`}
                 >
-                  {t.status}
+                  {tournament.status}
                 </span>
-
               </div>
             </Link>
           ))}
-
         </div>
       )}
-
     </div>
   );
 }
