@@ -38,13 +38,10 @@ export interface Tournament {
   id: number;
 
   name: string;
-
   description: string | null;
 
   sport: string;
-
   format: string;
-
   status: string;
 
   max_teams: number;
@@ -54,26 +51,35 @@ export interface Tournament {
   image_url: string | null;
 
   start_date: string | null;
-
   end_date: string | null;
-
   registration_deadline: string | null;
 
   prize_pool: number;
 
   game: string | null;
-
   platform: string | null;
-
   region: string | null;
 
   visibility: string;
 
   current_round: number;
-
   winner_team_id: number | null;
 
   is_registration_open: boolean;
+
+  created_at: string;
+}
+
+// =======================================
+// TOURNAMENT TEAM
+// =======================================
+
+export interface TournamentTeam {
+  id: number;
+
+  tournament_id: number;
+
+  team_id: number;
 
   created_at: string;
 }
@@ -86,27 +92,22 @@ export interface Team {
   id: number;
 
   name: string;
-
   tag: string;
 
   description: string | null;
 
   logo_url: string | null;
-
   banner_url: string | null;
 
   country: string | null;
-
   city: string | null;
 
   website: string | null;
-
   discord: string | null;
 
   owner_id: string;
 
   wins: number;
-
   losses: number;
 
   elo: number;
@@ -142,11 +143,9 @@ export interface Match {
   tournament_id: number;
 
   home_team_id: number;
-
   away_team_id: number;
 
   home_score: number;
-
   away_score: number;
 
   round: number;
@@ -154,7 +153,9 @@ export interface Match {
   status: string;
 
   starts_at: string | null;
-}// =======================================
+}
+
+// =======================================
 // PLAYER
 // =======================================
 
@@ -166,7 +167,6 @@ export interface Player {
   owner_id: string;
 
   first_name: string;
-
   last_name: string;
 
   nickname: string | null;
@@ -178,7 +178,6 @@ export interface Player {
   position: string | null;
 
   country: string | null;
-
   city: string | null;
 
   birth_date: string | null;
@@ -186,15 +185,11 @@ export interface Player {
   bio: string | null;
 
   wins: number;
-
   losses: number;
-
   draws: number;
 
   goals: number;
-
   assists: number;
-
   mvp: number;
 
   elo: number;
