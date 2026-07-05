@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import { Team } from "@/lib/types";
 import { TournamentService } from "@/services/tournament.service";
@@ -57,9 +58,23 @@ export default function RegisteredTeamsList({
       {teams.map((team) => (
         <div
           key={team.id}
-          className="rounded-lg border border-gray-800 p-4"
+          className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900 p-4 transition hover:border-primary"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {team.logo_url ? (
+              <Image
+                src={team.logo_url}
+                alt={team.name}
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
+                {team.name.charAt(0)}
+              </div>
+            )}
+
             <div>
               <h3 className="font-semibold">
                 {team.name}
@@ -69,10 +84,16 @@ export default function RegisteredTeamsList({
                 {team.tag}
               </p>
             </div>
+          </div>
 
-            <span className="text-sm text-gray-400">
+          <div className="text-right">
+            <p className="font-semibold">
               ELO {team.elo}
-            </span>
+            </p>
+
+            <p className="text-sm text-gray-400">
+              {team.wins}W · {team.losses}L
+            </p>
           </div>
         </div>
       ))}
