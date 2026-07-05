@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 
 import RegisterTeamDialog from "@/features/tournaments/components/RegisterTeamDialog";
 import RegisteredTeamsList from "@/features/tournaments/components/RegisteredTeamsList";
+import GenerateFixturesButton from "@/features/tournaments/components/GenerateFixturesButton";
 
 export default function TournamentDetail() {
   const { id } = useParams();
@@ -68,12 +69,21 @@ export default function TournamentDetail() {
           </p>
         </div>
 
-        <RegisterTeamDialog
-          tournamentId={tournamentId}
-          onRegistered={() =>
-            setRefreshKey((v) => v + 1)
-          }
-        />
+        <div className="flex gap-2">
+          <GenerateFixturesButton
+            tournamentId={tournamentId}
+            onGenerated={() =>
+              setRefreshKey((v) => v + 1)
+            }
+          />
+
+          <RegisterTeamDialog
+            tournamentId={tournamentId}
+            onRegistered={() =>
+              setRefreshKey((v) => v + 1)
+            }
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
