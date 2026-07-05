@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Match } from "@/lib/types";
+import { TournamentService } from "@/services/tournament.service";
 
 export class MatchService {
   static async getByTournament(
@@ -9,7 +10,8 @@ export class MatchService {
       .from("matches")
       .select("*")
       .eq("tournament_id", tournamentId)
-      .order("round", { ascending: true });
+      .order("round", { ascending: true })
+      .order("id", { ascending: true });
 
     if (error) throw error;
 
@@ -65,5 +67,33 @@ export class MatchService {
       .eq("id", id);
 
     if (error) throw error;
+  }
+
+  static async generateRoundRobin(
+    tournamentId: number
+  ): Promise<void> {
+    const teams =
+      await TournamentService.getRegisteredTeams(
+        tournamentId
+      );
+
+    if (teams.length < 2) {
+      throw new Error("At least 2 teams are required.");
+    }
+
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        await this.create({
+          tournament_id: tournamentId,
+          home_team_id: teams[i].id,
+          away_team_id: teams[j].id,
+          home_score: 0,
+          away_score: 0,
+          round: 1,
+          status: "Pending",
+          starts_at: null,
+        });
+      }
+    }
   }
 }
