@@ -1,142 +1,217 @@
-# 🏆 AllSports League
+# PROJECT.md
 
-## Estado
+# AllSports League
 
-**Versión:** v0.3.5-alpha
+## Información general
 
-**Estado:** 🟢 Desarrollo activo
+**Proyecto:** AllSports League
+
+**Versión actual:** v0.3.2-alpha
+
+**Sprint actual:** ASL-029
+
+**Estado:** Estable (Build limpio)
 
 ---
 
 # Stack
 
-- Next.js 16
-- React 19
-- TypeScript
-- TailwindCSS
-- Base UI
-- Supabase
-- Supabase Storage
-- React Hook Form
-- Zod
+* Next.js 16
+* React 19
+* TypeScript (strict)
+* TailwindCSS
+* Supabase
+* Base UI / shadcn-ui
+* Lucide Icons
 
 ---
 
 # Arquitectura
 
-```
-app/
-components/
-features/
-hooks/
-lib/
-services/
-public/
-```
+## app/
 
-Todo código nuevo deberá vivir dentro de `features`.
+Solo contiene páginas.
+
+No debe contener lógica de negocio.
 
 ---
 
-# Módulos
+## features/
 
-## Auth
+Contiene toda la lógica de negocio organizada por módulos.
 
-- ✅ Login
+Módulos actuales:
+
+* auth
+* dashboard
+* matches
+* players
+* standings
+* teams
+* tournaments
+
+---
+
+## services/
+
+Los servicios de la raíz existen únicamente como punto de acceso cuando es necesario.
+
+La implementación real debe vivir dentro de `features`.
+
+Ejemplo:
+
+* `features/players/services/player.service.ts` ← implementación
+* `services/player.service.ts` ← reexport
+
+No duplicar lógica entre ambos.
+
+---
+
+## lib/
+
+Contiene:
+
+* supabase
+* types
+* utils
+
+---
+
+## components/
+
+Componentes UI reutilizables.
+
+---
+
+# Módulos implementados
+
+## Authentication
+
+* Login
+* Sign Up
+* Forgot Password
+* Reset Password
+
+---
+
+## Dashboard
+
+* Estadísticas principales
+* StatCard reutilizable
+* Bienvenida dinámica
+
+Pendiente:
+
+* Próximos partidos
+* Últimos resultados
+* Actividad reciente
+* Widgets
+* Métricas
 
 ---
 
 ## Teams
 
-- ✅ CRUD
-- ✅ Perfil
-- ✅ Editar
-- ✅ Logo
-- ✅ Banner
-- ✅ Team Header
+* CRUD
+* Logos
+* Banners
+* Detalle del equipo
 
 ---
 
 ## Players
 
-- ✅ CRUD
-- ✅ Perfil
-- ✅ Avatar
-- ✅ Editar
-- ✅ Eliminar
-- ✅ Upload Avatar
+* CRUD
+* Avatar
+* Búsqueda
+* PlayerService
+* Team Players
 
 ---
 
 ## Tournaments
 
-- ✅ CRUD
-- ✅ TournamentService
-- ✅ Tournament Registration Base
-- 🚧 Register Teams
-- ⬜ Fixtures
-- ⬜ Standings
-- ⬜ Brackets
+* CRUD
+* Registro de equipos
+* Equipos registrados
 
 ---
 
 ## Matches
 
-- ✅ MatchService
-- ⬜ Match Center
-- ⬜ Live
-- ⬜ Results
+* Round Robin
+* MatchService
+* MatchResultDialog
+* Edit Result
+* Save Result
+* Finish Match
+* Reopen Match
+* Refresh automático
 
 ---
 
-# Servicios
+## Standings
 
-- ✅ TeamService
-- ✅ PlayerService
-- ✅ TournamentService
-- ✅ MatchService
-- ✅ TeamStorageService
-
----
-
-# Storage
-
-- ✅ team-logos
-- ✅ team-banners
-- ✅ player-avatars
+* StandingService
+* StandingsPage
+* StandingsTable
+* Cálculo dinámico
 
 ---
 
-# Base de datos
+# Convenciones
 
-- ✅ teams
-- ✅ players
-- ✅ tournaments
-- ✅ tournament_teams
-
----
-
-# Próximo Sprint
-
-## ASL-020
-
-- Register Team
-- Tournament Teams
-- Fixtures Generator
+* TypeScript strict.
+* Sin `any` innecesarios.
+* Componentes reutilizables.
+* No romper funcionalidades existentes.
+* Mantener separación por módulos.
+* Un archivo por respuesta.
+* Archivo completo.
+* Esperar siempre `npm run build`.
 
 ---
 
-# Reglas
+# Flujo de trabajo
 
-- Un archivo por sprint.
-- Proyecto siempre compilando.
-- Sin código duplicado.
-- Componentes reutilizables.
-- Servicios desacoplados.
-- No lógica de negocio en páginas.
+Antes de modificar cualquier archivo:
+
+1. Verificar si existe otro archivo con el mismo nombre.
+2. Confirmar la ruta correcta.
+3. Modificar únicamente un archivo.
+4. Esperar el resultado del build.
+
+Nunca asumir contenido de archivos no vistos.
 
 ---
 
-# Objetivo
+# Estado actual
 
-Completar el **Tournament Engine** antes de comenzar estadísticas, rankings y organización de ligas.
+Build:
+
+✅ Compila correctamente.
+
+Última verificación:
+
+* Next.js Build: OK
+* TypeScript: OK
+
+---
+
+# Próximo Sprint (ASL-029)
+
+Objetivo principal:
+
+Dashboard Avanzado.
+
+Orden recomendado:
+
+1. Dashboard widgets.
+2. Próximos partidos.
+3. Últimos resultados.
+4. Actividad reciente.
+5. Dashboard charts.
+6. Knockout Bracket.
+7. Live Matches.
+8. Estadísticas avanzadas.
+9. Realtime.

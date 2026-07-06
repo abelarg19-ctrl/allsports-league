@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { Tournament, Team } from "@/lib/types";
+import { Team, Tournament } from "@/lib/types";
 
 export class TournamentService {
   static async getAll(userId: string): Promise<Tournament[]> {
@@ -25,7 +25,9 @@ export class TournamentService {
       .eq("owner_id", userId)
       .single();
 
-    if (error) return null;
+    if (error) {
+      return null;
+    }
 
     return data as Tournament;
   }
@@ -62,15 +64,25 @@ export class TournamentService {
   ): Promise<Team[]> {
     const { data, error } = await supabase
       .from("tournament_teams")
-      .select(`
+      .select(
+        `
+        team_id,
         teams (*)
-      `)
-      .eq("tournament_id", tournamentId);
+      `
+      )
+      .eq("tournament_id", tournamentId)
+      .order("team_id", { ascending: true });
 
     if (error) throw error;
 
-    return (data ?? []).map(
-      (row: any) => row.teams as Team
-    );
+    return (data ?? [])
+      .map((row: { teams: Team | Team[] | null }) => {
+        if (Array.isArray(row.teams)) {
+          return row.teams[0] ?? null;
+        }
+
+        return row.teams;
+      })
+      .filter((team): team is Team => team !== null);
   }
 }

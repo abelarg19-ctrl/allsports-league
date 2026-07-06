@@ -14,6 +14,20 @@ export class PlayerService {
     return (data ?? []) as Player[];
   }
 
+  static async getCount(ownerId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from("players")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("owner_id", ownerId);
+
+    if (error) throw error;
+
+    return count ?? 0;
+  }
+
   static async getByTeam(teamId: number): Promise<Player[]> {
     const { data, error } = await supabase
       .from("players")

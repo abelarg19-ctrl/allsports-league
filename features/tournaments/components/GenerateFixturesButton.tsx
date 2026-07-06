@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { supabase } from "@/lib/supabase";
 import { MatchService } from "@/services/match.service";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,22 @@ export default function GenerateFixturesButton({
 
     try {
       setLoading(true);
+
+      // Evita generar fixtures duplicados
+      const { count, error } = await supabase
+        .from("matches")
+        .select("*", {
+          count: "exact",
+          head: true,
+        })
+        .eq("tournament_id", tournamentId);
+
+      if (error) throw error;
+
+      if ((count ?? 0) > 0) {
+        alert("Fixtures have already been generated.");
+        return;
+      }
 
       await MatchService.generateRoundRobin(
         tournamentId

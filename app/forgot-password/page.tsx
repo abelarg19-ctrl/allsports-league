@@ -2,28 +2,23 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function LoginPage() {
-  const router = useRouter();
-
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin() {
+  async function handleReset() {
     setLoading(true);
     setError("");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     setLoading(false);
@@ -33,24 +28,43 @@ export default function LoginPage() {
       return;
     }
 
-    if (!data.session) {
-      setError("Unable to create session.");
-      return;
-    }
+    setSuccess(true);
+  }
 
-    router.push("/dashboard");
+  if (success) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gray-950 px-6">
+        <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center">
+
+          <h1 className="text-3xl font-bold text-white">
+            Email Sent
+          </h1>
+
+          <p className="mt-4 text-gray-400">
+            Check your email for the password reset link.
+          </p>
+
+          <Link href="/login">
+            <Button className="mt-8 w-full">
+              Back to Sign In
+            </Button>
+          </Link>
+
+        </div>
+      </main>
+    );
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-950 px-6">
-      <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-8 shadow-xl">
+      <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-8">
 
         <h1 className="text-center text-3xl font-bold text-white">
-          AllSports League
+          Forgot Password
         </h1>
 
         <p className="mt-2 text-center text-sm text-gray-400">
-          Sign in to your account
+          Enter your email to receive a reset link.
         </p>
 
         <div className="mt-8 space-y-4">
@@ -62,13 +76,6 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
           {error && (
             <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-400">
               {error}
@@ -77,21 +84,21 @@ export default function LoginPage() {
 
           <Button
             className="w-full"
-            onClick={handleLogin}
+            onClick={handleReset}
             disabled={loading}
           >
-            {loading ? "Signing In..." : "Sign In"}
+            {loading ? "Sending..." : "Send Reset Link"}
           </Button>
 
         </div>
 
         <div className="mt-6 text-center text-sm text-gray-400">
-          Don't have an account?{" "}
+          Remember your password?{" "}
           <Link
-            href="/signup"
+            href="/login"
             className="font-semibold text-blue-400 hover:text-blue-300"
           >
-            Sign Up
+            Sign In
           </Link>
         </div>
 

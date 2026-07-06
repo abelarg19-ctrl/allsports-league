@@ -13,48 +13,55 @@ export default function DashboardLayout({
         </h1>
 
         <nav className="space-y-3">
-          <Link
-            href="/dashboard"
-            className="block text-gray-300 hover:text-white"
-          >
-            Dashboard
-          </Link>
+  <Link
+    href="/dashboard"
+    className="block text-gray-300 hover:text-white"
+  >
+    Dashboard
+  </Link>
 
-          <Link
-            href="/dashboard/tournaments"
-            className="block text-gray-300 hover:text-white"
-          >
-            Tournaments
-          </Link>
+  <Link
+    href="/dashboard/tournaments"
+    className="block text-gray-300 hover:text-white"
+  >
+    Tournaments
+  </Link>
 
-          <Link
-            href="/dashboard/teams"
-            className="block text-gray-300 hover:text-white"
-          >
-            Teams
-          </Link>
+  <Link
+    href="/dashboard/teams"
+    className="block text-gray-300 hover:text-white"
+  >
+    Teams
+  </Link>
 
-          <Link
-            href="/dashboard/players"
-            className="block text-gray-300 hover:text-white"
-          >
-            Players
-          </Link>
+  <Link
+    href="/dashboard/players"
+    className="block text-gray-300 hover:text-white"
+  >
+    Players
+  </Link>
 
-          <Link
-            href="/dashboard/matches"
-            className="block text-gray-300 hover:text-white"
-          >
-            Matches
-          </Link>
+  <Link
+    href="/dashboard/matches"
+    className="block text-gray-300 hover:text-white"
+  >
+    Matches
+  </Link>
 
-          <Link
-            href="/dashboard/create"
-            className="block text-gray-300 hover:text-white"
-          >
-            Create Tournament
-          </Link>
-        </nav>
+  <Link
+    href="/dashboard/standings"
+    className="block text-gray-300 hover:text-white"
+  >
+    Standings
+  </Link>
+
+  <Link
+    href="/dashboard/create"
+    className="block text-gray-300 hover:text-white"
+  >
+    Create Tournament
+  </Link>
+</nav>
       </aside>
 
       <main className="flex-1 p-8">

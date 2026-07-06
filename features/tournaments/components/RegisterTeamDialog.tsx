@@ -36,7 +36,7 @@ export default function RegisterTeamDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [teamId, setTeamId] = useState<string>("");
+  const [teamId, setTeamId] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -52,8 +52,22 @@ export default function RegisterTeamDialog({
 
     if (!user) return;
 
-    const data = await TeamService.getAll(user.id);
-    setTeams(data);
+    const myTeams = await TeamService.getAll(user.id);
+
+    const registered =
+      await TournamentService.getRegisteredTeams(
+        tournamentId
+      );
+
+    const registeredIds = new Set(
+      registered.map((team) => team.id)
+    );
+
+    setTeams(
+      myTeams.filter(
+        (team) => !registeredIds.has(team.id)
+      )
+    );
   }
 
   async function handleRegister() {
@@ -67,57 +81,84 @@ export default function RegisterTeamDialog({
         Number(teamId)
       );
 
-      onRegistered?.();
-      setOpen(false);
+      alert("Team registered successfully.");
+
       setTeamId("");
-    } catch (error) {
+      setOpen(false);
+
+      onRegistered?.();
+    } catch (error: any) {
       console.error(error);
-      alert("Unable to register team.");
+
+      alert(
+        error?.message ??
+          "Unable to register team."
+      );
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
       <DialogTrigger
         render={<Button>Register Team</Button>}
       />
 
       <DialogContent>
+
         <DialogHeader>
-          <DialogTitle>Register Team</DialogTitle>
+
+          <DialogTitle>
+            Register Team
+          </DialogTitle>
+
           <DialogDescription>
-            Select a team to register.
+            Select one of your teams.
           </DialogDescription>
+
         </DialogHeader>
 
-        <Select
+        {teams.length === 0 ? (
+          <div className="rounded-lg border p-4 text-center text-sm text-gray-400">
+            All your teams are already registered.
+          </div>
+        ) : (
+          <>
+            <Select
   value={teamId}
   onValueChange={(value) => setTeamId(value ?? "")}
 >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a team" />
-          </SelectTrigger>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a team" />
+              </SelectTrigger>
 
-          <SelectContent>
-            {teams.map((team) => (
-              <SelectItem
-                key={team.id}
-                value={String(team.id)}
-              >
-                {team.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              <SelectContent>
+                {teams.map((team) => (
+                  <SelectItem
+                    key={team.id}
+                    value={String(team.id)}
+                  >
+                    {team.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-        <Button
-          onClick={handleRegister}
-          disabled={!teamId || loading}
-        >
-          {loading ? "Registering..." : "Register Team"}
-        </Button>
+            <Button
+              onClick={handleRegister}
+              disabled={!teamId || loading}
+            >
+              {loading
+                ? "Registering..."
+                : "Register Team"}
+            </Button>
+          </>
+        )}
+
       </DialogContent>
     </Dialog>
   );

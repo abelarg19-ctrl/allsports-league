@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 
 import { supabase } from "@/lib/supabase";
@@ -54,7 +55,11 @@ export default function TournamentDetail() {
   }
 
   if (!tournament) {
-    return <p className="text-red-400">Tournament not found.</p>;
+    return (
+      <p className="text-red-400">
+        Tournament not found.
+      </p>
+    );
   }
 
   return (
@@ -70,7 +75,22 @@ export default function TournamentDetail() {
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+
+          <Link
+            href={`/dashboard/tournaments/${tournamentId}/results`}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Enter Results
+          </Link>
+
+          <Link
+            href={`/dashboard/tournaments/${tournamentId}/standings`}
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+          >
+            Standings
+          </Link>
+
           <GenerateFixturesButton
             tournamentId={tournamentId}
             onGenerated={() =>
@@ -89,18 +109,33 @@ export default function TournamentDetail() {
 
       <div className="grid grid-cols-3 gap-4">
         <div className="rounded-xl bg-gray-900 p-4">
-          <p className="text-sm text-gray-400">Status</p>
-          <p className="text-lg font-bold">{tournament.status}</p>
+          <p className="text-sm text-gray-400">
+            Status
+          </p>
+
+          <p className="text-lg font-bold">
+            {tournament.status}
+          </p>
         </div>
 
         <div className="rounded-xl bg-gray-900 p-4">
-          <p className="text-sm text-gray-400">Max Teams</p>
-          <p className="text-lg font-bold">{tournament.max_teams}</p>
+          <p className="text-sm text-gray-400">
+            Max Teams
+          </p>
+
+          <p className="text-lg font-bold">
+            {tournament.max_teams}
+          </p>
         </div>
 
         <div className="rounded-xl bg-gray-900 p-4">
-          <p className="text-sm text-gray-400">Type</p>
-          <p className="text-lg font-bold">{tournament.format}</p>
+          <p className="text-sm text-gray-400">
+            Type
+          </p>
+
+          <p className="text-lg font-bold">
+            {tournament.format}
+          </p>
         </div>
       </div>
 

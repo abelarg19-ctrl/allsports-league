@@ -14,6 +14,20 @@ export class TeamService {
     return (data ?? []) as Team[];
   }
 
+  static async getCount(ownerId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from("teams")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("owner_id", ownerId);
+
+    if (error) throw error;
+
+    return count ?? 0;
+  }
+
   static async getById(id: number): Promise<Team> {
     const { data, error } = await supabase
       .from("teams")
@@ -24,6 +38,34 @@ export class TeamService {
     if (error) throw error;
 
     return data as Team;
+  }
+
+  static async getName(id: number): Promise<string> {
+    const { data, error } = await supabase
+      .from("teams")
+      .select("name")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+
+    return data.name;
+  }
+
+  static async getNames(ids: number[]): Promise<Record<number, string>> {
+    if (ids.length === 0) return {};
+
+    const { data, error } = await supabase
+      .from("teams")
+      .select("id,name")
+      .in("id", ids);
+
+    if (error) throw error;
+
+    return (data ?? []).reduce<Record<number, string>>((acc, team) => {
+      acc[team.id] = team.name;
+      return acc;
+    }, {});
   }
 
   static async create(

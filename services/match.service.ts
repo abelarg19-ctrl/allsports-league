@@ -10,8 +10,43 @@ export class MatchService {
       .from("matches")
       .select("*")
       .eq("tournament_id", tournamentId)
-      .order("round", { ascending: true })
-      .order("id", { ascending: true });
+      .order("round")
+      .order("id");
+
+    if (error) throw error;
+
+    return (data ?? []) as Match[];
+  }
+
+  static async getUpcomingByTournament(
+    tournamentId: number,
+    limit = 5
+  ): Promise<Match[]> {
+    const { data, error } = await supabase
+      .from("matches")
+      .select("*")
+      .eq("tournament_id", tournamentId)
+      .eq("status", "Pending")
+      .order("round")
+      .order("id")
+      .limit(limit);
+
+    if (error) throw error;
+
+    return (data ?? []) as Match[];
+  }
+
+  static async getRecentResultsByTournament(
+    tournamentId: number,
+    limit = 5
+  ): Promise<Match[]> {
+    const { data, error } = await supabase
+      .from("matches")
+      .select("*")
+      .eq("tournament_id", tournamentId)
+      .eq("status", "Finished")
+      .order("id", { ascending: false })
+      .limit(limit);
 
     if (error) throw error;
 
@@ -60,6 +95,62 @@ export class MatchService {
     return data as Match;
   }
 
+  static async updateResult(
+    id: number,
+    homeScore: number,
+    awayScore: number
+  ): Promise<Match> {
+    const status =
+      homeScore === null || awayScore === null
+        ? "Pending"
+        : "Finished";
+
+    const { data, error } = await supabase
+      .from("matches")
+      .update({
+        home_score: homeScore,
+        away_score: awayScore,
+        status,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data as Match;
+  }
+
+  static async finishMatch(id: number): Promise<Match> {
+    const { data, error } = await supabase
+      .from("matches")
+      .update({
+        status: "Finished",
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data as Match;
+  }
+
+  static async reopenMatch(id: number): Promise<Match> {
+    const { data, error } = await supabase
+      .from("matches")
+      .update({
+        status: "Pending",
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data as Match;
+  }
+
   static async delete(id: number): Promise<void> {
     const { error } = await supabase
       .from("matches")
@@ -81,6 +172,8 @@ export class MatchService {
       throw new Error("At least 2 teams are required.");
     }
 
+    let round = 1;
+
     for (let i = 0; i < teams.length; i++) {
       for (let j = i + 1; j < teams.length; j++) {
         await this.create({
@@ -89,10 +182,12 @@ export class MatchService {
           away_team_id: teams[j].id,
           home_score: 0,
           away_score: 0,
-          round: 1,
+          round,
           status: "Pending",
           starts_at: null,
         });
+
+        round++;
       }
     }
   }
