@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CalendarDays, Clock3, Swords } from "lucide-react";
 
 import { Match } from "@/lib/types";
 import { TeamService } from "@/services/team.service";
@@ -21,7 +22,7 @@ export default function UpcomingMatches({
 
   useEffect(() => {
     async function loadTeams() {
-      if (matches.length === 0) return;
+      if (!matches.length) return;
 
       const ids = Array.from(
         new Set(
@@ -44,40 +45,82 @@ export default function UpcomingMatches({
   }, [matches]);
 
   return (
-    <Card>
+    <Card className="overflow-hidden border-white/10 bg-white/5 backdrop-blur-xl">
       <CardContent className="p-6">
-        <h2 className="mb-4 text-lg font-bold">
-          Upcoming Matches
-        </h2>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10">
+            <CalendarDays className="h-6 w-6 text-cyan-400" />
+          </div>
 
-        {matches.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No upcoming matches.
-          </p>
+          <div>
+            <h2 className="text-xl font-bold">
+              Upcoming Matches
+            </h2>
+
+            <p className="text-sm text-muted-foreground">
+              Next scheduled games
+            </p>
+          </div>
+        </div>
+
+        {!matches.length ? (
+          <div className="rounded-2xl border border-dashed border-white/10 p-10 text-center">
+            <CalendarDays className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+
+            <p className="text-muted-foreground">
+              No upcoming matches.
+            </p>
+          </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {matches.map((match) => (
               <div
                 key={match.id}
-                className="flex items-center justify-between rounded-lg border p-3"
+                className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-xl hover:shadow-cyan-500/10"
               >
-                <div>
-                  <p className="font-medium">
-                    {teamNames[match.home_team_id] ??
-                      "Loading..."}{" "}
-                    vs{" "}
-                    {teamNames[match.away_team_id] ??
-                      "Loading..."}
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
 
-                  <p className="text-xs text-muted-foreground">
-                    Round {match.round}
-                  </p>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10">
+                      <Swords className="h-6 w-6 text-cyan-400" />
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold">
+                        {teamNames[match.home_team_id] ??
+                          "Loading..."}
+                      </h3>
+
+                      <p className="text-xs text-muted-foreground">
+                        vs
+                      </p>
+
+                      <h3 className="font-semibold">
+                        {teamNames[match.away_team_id] ??
+                          "Loading..."}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
+                      <Clock3 className="h-3.5 w-3.5" />
+                      {match.status}
+                    </div>
+
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      Round {match.round}
+                    </p>
+
+                    {match.starts_at && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {new Date(
+                          match.starts_at
+                        ).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
                 </div>
-
-                <span className="rounded bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500">
-                  {match.status}
-                </span>
               </div>
             ))}
           </div>

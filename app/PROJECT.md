@@ -1,246 +1,186 @@
-# AllSports League
-Version: v0.15-alpha
-Status: Stable
-Last Updated: July 2026
+# PROJECT.md
+
+# AllSports League (ASL)
+
+**Versión:** v0.18-alpha
+**Estado:** En desarrollo (estable)
 
 ---
 
-# Project Overview
+# Objetivo
 
-AllSports League (ASL) is a sports tournament management platform built with Next.js 16, React 19, TypeScript and Supabase.
+Construir una plataforma moderna para la gestión de ligas, torneos, equipos y jugadores, con una arquitectura limpia, escalable y mantenible.
 
-The goal is to provide a complete platform for managing:
-
-- Tournaments
-- Teams
-- Players
-- Fixtures
-- Results
-- Standings
-- Dashboard
-- Authentication
-- Public Pages
-- Playoffs
-- Statistics
+La prioridad es siempre mantener el proyecto compilando y evitar cambios que rompan funcionalidades existentes.
 
 ---
 
 # Stack
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript (strict)
-- TailwindCSS
-- Base UI
-- Lucide Icons
-- Supabase
-- Supabase Auth
-- Supabase Storage
+* Next.js 16
+* React 19
+* TypeScript (Strict)
+* TailwindCSS
+* Supabase
+* App Router
 
 ---
 
-# Architecture
+# Arquitectura
 
-app/
-components/
-features/
-services/
-lib/
-public/
+* app/
+* components/
+* features/
+* services/
+* lib/
+* public/
 
-Every new feature should live inside features/.
-
-Services are responsible for Supabase.
-
-Pages only orchestrate components.
+Todo el código nuevo debe respetar esta estructura.
 
 ---
 
-# Current Modules
+# Reglas de desarrollo
 
-## Authentication
-
-✅ Login
-
-✅ Signup
-
-✅ Forgot Password
-
-✅ Reset Password
-
----
-
-## Dashboard
-
-✅ Stats Cards
-
-✅ Latest Results
-
-✅ Upcoming Matches
-
-✅ Recent Activity
+* Un sprint a la vez.
+* Máximo un archivo completo por respuesta.
+* Nunca modificar muchos archivos al mismo tiempo.
+* Siempre entregar archivos completos.
+* Reutilizar componentes y servicios existentes.
+* No duplicar lógica.
+* No romper funcionalidades existentes.
+* Evitar el uso de `any`.
+* TypeScript estricto.
+* Analizar antes de modificar.
+* Mantener una arquitectura limpia y modular.
 
 ---
 
-## Teams
+# Flujo de trabajo
 
-✅ CRUD
+Al finalizar cada sprint:
 
-✅ Logo Upload
-
-✅ Banner Upload
-
-✅ Team Header
-
-✅ Team Members
-
----
-
-## Players
-
-✅ CRUD
-
-✅ Avatar Upload
-
-✅ Team Players
-
----
-
-## Tournaments
-
-✅ CRUD
-
-✅ Register Teams
-
-✅ Fixtures Generator
-
-✅ Tournament Details
-
----
-
-## Matches
-
-✅ Generate Fixtures
-
-✅ Enter Results
-
-✅ Match Result Dialog
-
----
-
-## Standings
-
-✅ Automatic calculation
-
-✅ Dynamic table
-
----
-
-# Current Sprint
-
-ASL-015
-
-Current objective:
-
-Replace all Team IDs with real team information.
-
-Show:
-
-- Team name
-- Team logo
-- Team statistics
-
-Never display:
-
-Team #1
-
-Team #2
-
-Unknown Team
-
-Loading...
-
----
-
-# Build Status
-
+```bash
 npm run build
+```
 
-✅ Compiles successfully
+Si existe algún error:
 
-TypeScript
+* Resolverlo antes de continuar.
+* No avanzar al siguiente sprint.
 
-✅ No errors
+Después:
 
----
+```bash
+git add .
+git commit -m "ASL-XXX descripción"
+git push
+```
 
-# Coding Rules
+Actualizar siempre:
 
-Always preserve architecture.
-
-Never rewrite working modules unnecessarily.
-
-One sprint at a time.
-
-Maximum one file replacement per response.
-
-Always return COMPLETE files.
-
-Never return partial code unless explicitly requested.
-
-Every file delivered must compile.
-
-Always run:
-
-npm run build
-
-after every sprint.
+* PROJECT.md
+* CHANGELOG.md
 
 ---
 
-# Next Sprints
+# Estado actual
 
-ASL-015
-Improve TeamService
-Real team information everywhere
+## Completado
 
-ASL-016
-Public Team Profile
-
-ASL-017
-Public Player Profile
-
-ASL-018
-Tournament Public Page
-
-ASL-019
-Playoffs
-
-ASL-020
-Player Statistics
-
-ASL-021
-Tournament Statistics
-
-ASL-022
-Notifications
-
-ASL-023
-Admin Panel
-
-ASL-024
-Deployment
+* Authentication
+* Dashboard
+* Teams CRUD
+* Players CRUD
+* Tournament CRUD
+* Fixtures
+* Enter Results
+* Standings
+* Dashboard Statistics
+* Upcoming Matches
+* Latest Results
+* Recent Activity
+* Team Logos
+* Team Banners
+* Perfiles públicos de equipos
+* Perfiles públicos de jugadores
+* Eliminación de Team IDs visibles
 
 ---
 
-Current Stability
+# Seguridad
 
-9.5 / 10
+Resultados protegidos:
 
-Architecture
+* Solo el propietario del torneo puede modificarlos.
+* Los demás usuarios tienen acceso de solo lectura.
+* Preparado para RLS en Supabase.
 
-Stable
+---
 
-Production Ready
+# Diseño
 
-Approximately 90%
+Actualmente migrando a Premium UI.
+
+Incluye:
+
+* Glassmorphism
+* Gradientes
+* Mejor tipografía
+* Animaciones
+* Responsive
+* Componentes reutilizables
+
+---
+
+# Roadmap
+
+## ASL-021
+
+Premium UI
+
+* Dashboard Premium
+* Glassmorphism global
+* Hero moderno
+* Componentes visuales reutilizables
+* Skeleton Loaders
+
+## ASL-022
+
+Plataforma pública
+
+* Perfil público de torneos
+* Landing Page
+* Equipos destacados
+* Jugadores destacados
+
+## ASL-023
+
+Rankings
+
+* Equipos
+* Jugadores
+* Torneos
+
+## ASL-024
+
+Búsqueda global
+
+## ASL-025
+
+Notificaciones
+
+## ASL-026
+
+Admin Center
+
+## ASL-027
+
+Realtime
+
+## ASL-028
+
+Performance
+
+## ASL-029
+
+Release v1.0

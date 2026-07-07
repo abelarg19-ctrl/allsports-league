@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Team } from "@/lib/types";
 import { TournamentService } from "@/services/tournament.service";
@@ -17,7 +18,7 @@ export default function RegisteredTeamsList({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadTeams();
+    void loadTeams();
   }, [tournamentId]);
 
   async function loadTeams() {
@@ -39,63 +40,94 @@ export default function RegisteredTeamsList({
 
   if (loading) {
     return (
-      <p className="text-gray-400">
-        Loading teams...
-      </p>
+      <div className="flex justify-center py-10">
+        <p className="text-sm text-gray-400 animate-pulse">
+          Loading teams...
+        </p>
+      </div>
     );
   }
 
-  if (teams.length === 0) {
+  if (!teams.length) {
     return (
-      <p className="text-gray-400">
-        No teams registered yet.
-      </p>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center backdrop-blur-xl">
+        <p className="text-gray-400">
+          No teams registered yet.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {teams.map((team) => (
-        <div
+        <Link
           key={team.id}
-          className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900 p-4 transition hover:border-primary"
+          href={`/teams/${team.id}`}
+          className="group"
         >
-          <div className="flex items-center gap-4">
-            {team.logo_url ? (
-              <Image
-                src={team.logo_url}
-                alt={team.name}
-                width={48}
-                height={48}
-                className="h-12 w-12 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
-                {team.name.charAt(0)}
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10">
+            <div className="flex items-center gap-4">
+              {team.logo_url ? (
+                <Image
+                  src={team.logo_url}
+                  alt={team.name}
+                  width={72}
+                  height={72}
+                  className="h-16 w-16 rounded-full border-2 border-white/10 object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-xl font-bold text-white">
+                  {team.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate text-lg font-bold text-white transition-colors group-hover:text-cyan-300">
+                  {team.name}
+                </h3>
+
+                <p className="text-sm text-gray-400">
+                  {team.tag}
+                </p>
               </div>
-            )}
+            </div>
 
-            <div>
-              <h3 className="font-semibold">
-                {team.name}
-              </h3>
+            <div className="my-5 h-px bg-white/10" />
 
-              <p className="text-sm text-gray-400">
-                {team.tag}
-              </p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-xl bg-black/20 p-3">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  ELO
+                </p>
+
+                <p className="mt-1 text-xl font-bold text-cyan-300">
+                  {team.elo}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-black/20 p-3">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Wins
+                </p>
+
+                <p className="mt-1 text-xl font-bold text-green-400">
+                  {team.wins}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-black/20 p-3">
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Losses
+                </p>
+
+                <p className="mt-1 text-xl font-bold text-red-400">
+                  {team.losses}
+                </p>
+              </div>
             </div>
           </div>
-
-          <div className="text-right">
-            <p className="font-semibold">
-              ELO {team.elo}
-            </p>
-
-            <p className="text-sm text-gray-400">
-              {team.wins}W · {team.losses}L
-            </p>
-          </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

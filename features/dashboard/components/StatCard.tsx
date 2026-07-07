@@ -27,54 +27,58 @@ export default function StatCard({
   badge,
 }: Props) {
   return (
-    <Card className="transition-all hover:shadow-lg">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
+    <Card className="group overflow-hidden border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10">
+      <CardContent className="relative p-6">
+        <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-cyan-500/10 blur-3xl transition-all duration-300 group-hover:bg-cyan-400/20" />
+
+        <div className="relative flex items-start justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
               {title}
             </p>
 
-            <h2 className="mt-2 text-3xl font-bold">
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight">
               {value}
             </h2>
 
             {subtitle && (
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-3 text-sm text-muted-foreground">
                 {subtitle}
               </p>
             )}
           </div>
 
-          <Icon
-            className={`h-10 w-10 ${iconClassName ?? ""}`}
-          />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
+            <Icon
+              className={`h-7 w-7 ${iconClassName ?? "text-cyan-400"}`}
+            />
+          </div>
         </div>
 
         {(trend || badge) && (
-          <div className="mt-4 flex items-center justify-between">
+          <div className="relative mt-6 flex items-center justify-between border-t border-white/10 pt-4">
             {trend === "up" && (
-              <div className="flex items-center gap-1 text-xs text-green-500">
+              <div className="flex items-center gap-1 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">
                 <TrendingUp className="h-4 w-4" />
                 Increasing
               </div>
             )}
 
             {trend === "down" && (
-              <div className="flex items-center gap-1 text-xs text-red-500">
+              <div className="flex items-center gap-1 rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400">
                 <TrendingDown className="h-4 w-4" />
                 Decreasing
               </div>
             )}
 
             {trend === "neutral" && (
-              <div className="text-xs text-muted-foreground">
+              <div className="rounded-full bg-white/10 px-3 py-1 text-xs text-muted-foreground">
                 Stable
               </div>
             )}
 
             {badge && (
-              <span className="rounded-full bg-muted px-2 py-1 text-xs">
+              <span className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
                 {badge}
               </span>
             )}

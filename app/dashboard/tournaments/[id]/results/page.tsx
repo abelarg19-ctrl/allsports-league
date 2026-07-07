@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { Lock } from "lucide-react";
 
 import { MatchService } from "@/services/match.service";
 import { TeamService } from "@/services/team.service";
@@ -75,6 +76,10 @@ export default function TournamentResultsPage() {
   }
 
   async function save(match: EditableMatch) {
+    if (match.status === "Finished") {
+      return;
+    }
+
     try {
       setSavingId(match.id);
 
@@ -88,8 +93,8 @@ export default function TournamentResultsPage() {
 
       await loadMatches();
     } catch (error) {
-      console.error("Error saving result:", error);
-      alert("Failed to save match result.");
+      console.error(error);
+      alert("Failed to save result.");
     } finally {
       setSavingId(null);
     }
@@ -114,7 +119,7 @@ export default function TournamentResultsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 text-gray-400">
+      <div className="p-6 text-muted-foreground">
         Loading results...
       </div>
     );
@@ -122,54 +127,69 @@ export default function TournamentResultsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">
-        Enter Results
-      </h1>
+
+      <div>
+        <h1 className="text-3xl font-bold">
+          Enter Results
+        </h1>
+
+        <p className="mt-2 text-muted-foreground">
+          Finished matches become read-only.
+        </p>
+      </div>
 
       {matches.map((match) => {
         const home = teams[match.home_team_id];
         const away = teams[match.away_team_id];
 
+        const locked =
+          match.status === "Finished";
+
         return (
           <div
             key={match.id}
-            className="rounded-xl border border-gray-700 bg-gray-900 p-5"
+            className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
           >
-            <div className="mb-4 flex items-center justify-between">
-              <span className="font-semibold">
+            <div className="mb-6 flex items-center justify-between">
+              <span className="rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-wider">
                 Round {match.round}
               </span>
 
-              <span
-                className={`rounded px-3 py-1 text-xs ${
-                  match.status === "Finished"
-                    ? "bg-green-600"
-                    : "bg-yellow-600"
-                }`}
-              >
-                {match.status}
-              </span>
+              {locked ? (
+                <span className="flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-1 text-xs font-semibold text-emerald-400">
+                  <Lock className="h-3.5 w-3.5" />
+                  Locked
+                </span>
+              ) : (
+                <span className="rounded-full bg-yellow-500/10 px-4 py-1 text-xs font-semibold text-yellow-400">
+                  Pending
+                </span>
+              )}
             </div>
 
             <div className="grid grid-cols-5 items-center gap-4">
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-3">
                 {home?.logo_url && (
                   <Image
                     src={home.logo_url}
                     alt={home.name}
-                    width={32}
-                    height={32}
-                    className="rounded-full object-cover"
+                    width={40}
+                    height={40}
+                    className="rounded-full"
                   />
                 )}
 
-                <span>
+                <span className="font-semibold">
                   {home?.name ?? "Loading..."}
                 </span>
-              </div>              <input
+              </div>
+
+              <input
                 type="number"
                 min={0}
-                className="rounded border border-gray-700 bg-gray-800 p-2 text-center"
+                disabled={locked}
+                className="rounded-xl border border-white/10 bg-black/20 p-3 text-center disabled:cursor-not-allowed disabled:opacity-50"
                 value={match.home_score}
                 onChange={(e) =>
                   updateScore(
@@ -180,14 +200,15 @@ export default function TournamentResultsPage() {
                 }
               />
 
-              <div className="text-center font-bold">
+              <div className="text-center text-xl font-bold">
                 VS
               </div>
 
               <input
                 type="number"
                 min={0}
-                className="rounded border border-gray-700 bg-gray-800 p-2 text-center"
+                disabled={locked}
+                className="rounded-xl border border-white/10 bg-black/20 p-3 text-center disabled:cursor-not-allowed disabled:opacity-50"
                 value={match.away_score}
                 onChange={(e) =>
                   updateScore(
@@ -198,8 +219,8 @@ export default function TournamentResultsPage() {
                 }
               />
 
-              <div className="flex items-center justify-end gap-2">
-                <span>
+              <div className="flex items-center justify-end gap-3">
+                <span className="font-semibold">
                   {away?.name ?? "Loading..."}
                 </span>
 
@@ -207,23 +228,29 @@ export default function TournamentResultsPage() {
                   <Image
                     src={away.logo_url}
                     alt={away.name}
-                    width={32}
-                    height={32}
-                    className="rounded-full object-cover"
+                    width={40}
+                    height={40}
+                    className="rounded-full"
                   />
                 )}
               </div>
             </div>
 
-            <button
-              onClick={() => save(match)}
-              disabled={savingId === match.id}
-              className="mt-5 rounded-lg bg-green-600 px-5 py-2 font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {savingId === match.id
-                ? "Saving..."
-                : "Save Result"}
-            </button>
+            {locked ? (
+              <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-300">
+                This match has been finalized. Only tournament administrators can modify it.
+              </div>
+            ) : (
+              <button
+                onClick={() => save(match)}
+                disabled={savingId === match.id}
+                className="mt-5 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
+              >
+                {savingId === match.id
+                  ? "Saving..."
+                  : "Save Result"}
+              </button>
+            )}
           </div>
         );
       })}
