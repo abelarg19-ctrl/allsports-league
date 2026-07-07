@@ -1,15 +1,48 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Match } from "@/lib/types";
+import { TeamService } from "@/services/team.service";
+
 import { Card, CardContent } from "@/components/ui/card";
 
 type Props = {
   matches: Match[];
 };
 
+type TeamMap = Record<number, string>;
+
 export default function UpcomingMatches({
   matches,
 }: Props) {
+  const [teamNames, setTeamNames] =
+    useState<TeamMap>({});
+
+  useEffect(() => {
+    async function loadTeams() {
+      if (matches.length === 0) return;
+
+      const ids = Array.from(
+        new Set(
+          matches.flatMap((match) => [
+            match.home_team_id,
+            match.away_team_id,
+          ])
+        )
+      );
+
+      try {
+        const names = await TeamService.getNames(ids);
+        setTeamNames(names);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    void loadTeams();
+  }, [matches]);
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -30,7 +63,11 @@ export default function UpcomingMatches({
               >
                 <div>
                   <p className="font-medium">
-                    Team #{match.home_team_id} vs Team #{match.away_team_id}
+                    {teamNames[match.home_team_id] ??
+                      "Loading..."}{" "}
+                    vs{" "}
+                    {teamNames[match.away_team_id] ??
+                      "Loading..."}
                   </p>
 
                   <p className="text-xs text-muted-foreground">
