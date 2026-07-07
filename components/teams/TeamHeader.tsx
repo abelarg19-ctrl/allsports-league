@@ -13,76 +13,79 @@ import { Team } from "@/lib/types";
 
 interface Props {
   team: Team;
-  onLogoUploaded: (logoUrl: string) => void;
-  onTeamUpdated: (team: Team) => void;
+  onLogoUploaded?: (logoUrl: string) => void;
+  onTeamUpdated?: (team: Team) => void;
+  readOnly?: boolean;
 }
 
 export default function TeamHeader({
   team,
   onLogoUploaded,
   onTeamUpdated,
+  readOnly = false,
 }: Props) {
   return (
     <Card className="overflow-hidden">
-      {/* Banner */}
-      <div className="relative h-56 w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 group">
+      <div className="relative group h-56 w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+        {team.banner_url && (
+          <img
+            src={team.banner_url}
+            alt="Banner"
+            className="h-full w-full object-cover"
+          />
+        )}
 
-  {team.banner_url && (
-    <img
-      src={team.banner_url}
-      alt="Banner"
-      className="w-full h-full object-cover"
-    />
-  )}
-
-  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-
-    <UploadTeamBanner
-      teamId={team.id}
-      onUploaded={(bannerUrl) =>
-        onTeamUpdated({
-          ...team,
-          banner_url: bannerUrl,
-        })
-      }
-    />
-
-  </div>
-
-</div>
+        {!readOnly && onTeamUpdated && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <UploadTeamBanner
+              teamId={team.id}
+              onUploaded={(bannerUrl) =>
+                onTeamUpdated({
+                  ...team,
+                  banner_url: bannerUrl,
+                })
+              }
+            />
+          </div>
+        )}
+      </div>
 
       <CardContent className="relative px-8 pb-8">
-        <div className="-mt-16 flex flex-col md:flex-row gap-6 md:items-end justify-between">
+        <div className="-mt-16 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="flex gap-6">
-            {/* Logo */}
             <div className="flex flex-col items-center">
               {team.logo_url ? (
                 <img
                   src={team.logo_url}
                   alt={team.name}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg"
+                  className="h-32 w-32 rounded-full border-4 border-background object-cover shadow-lg"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-full bg-gray-800 border-4 border-background shadow-lg flex items-center justify-center text-5xl">
+                <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-background bg-gray-800 text-5xl shadow-lg">
                   ⚽
                 </div>
               )}
 
-              <div className="mt-4">
-                <UploadTeamLogo
-                  teamId={team.id}
-                  onUploaded={onLogoUploaded}
-                />
-              </div>
+              {!readOnly && onLogoUploaded && (
+                <div className="mt-4">
+                  <UploadTeamLogo
+                    teamId={team.id}
+                    onUploaded={onLogoUploaded}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Info */}
             <div className="pb-2">
-              <h1 className="text-4xl font-bold">{team.name}</h1>
+              <h1 className="text-4xl font-bold">
+                {team.name}
+              </h1>
 
-              <Badge className="mt-2">{team.tag}</Badge>
+              <Badge className="mt-2">
+                {team.tag}
+              </Badge>
 
-              <div className="flex flex-wrap gap-6 mt-5 text-muted-foreground">
+              <div className="mt-5 flex flex-wrap gap-6 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <MapPin size={18} />
                   {team.country || "-"}
@@ -94,15 +97,14 @@ export default function TeamHeader({
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className="self-start md:self-end">
-            <EditTeamDialog
-              team={team}
-              onUpdated={onTeamUpdated}
-            />
-          </div>
+          </div>          {!readOnly && onTeamUpdated && (
+            <div className="self-start md:self-end">
+              <EditTeamDialog
+                team={team}
+                onUpdated={onTeamUpdated}
+              />
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
