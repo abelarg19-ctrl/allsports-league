@@ -1,132 +1,204 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Activity,
+  CalendarDays,
+  Swords,
+  Trophy,
+  Users,
+  User,
+} from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
-import { Match, Standing, Team, Tournament } from "@/lib/types";
+import { Match } from "@/lib/types";
 
-import { MatchService } from "@/services/match.service";
-import { StandingService } from "@/services/standing.service";
 import { TournamentService } from "@/services/tournament.service";
+import { TeamService } from "@/services/team.service";
+import { MatchService } from "@/services/match.service";
+import { PlayerService } from "@/services/player.service";
 
-import StandingsTable from "@/features/standings/components/StandingsTable";
+import StatCard from "@/features/dashboard/components/StatCard";
+import UpcomingMatches from "@/features/dashboard/components/UpcomingMatches";
+import LatestResults from "@/features/dashboard/components/LatestResults";
+import RecentActivity from "@/features/dashboard/components/RecentActivity";
 
-export default function StandingsPage() {
-  const [loading, setLoading] = useState(true);
+export default function Dashboard() {
+  const [stats, setStats] = useState({
+    tournaments: 0,
+    active: 0,
+    finished: 0,
+    teams: 0,
+    players: 0,
+    matches: 0,
+  });
 
-  const [tournaments, setTournaments] = useState<Tournament[]>([]);
-  const [selectedTournament, setSelectedTournament] =
-    useState<number | null>(null);
+  const [userName, setUserName] = useState("Player");
 
-  const [standings, setStandings] = useState<Standing[]>([]);
+  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
+  const [latestResults, setLatestResults] = useState<Match[]>([]);
 
   useEffect(() => {
-    void loadTournaments();
+    void loadDashboard();
   }, []);
 
-  useEffect(() => {
-    if (selectedTournament !== null) {
-      void loadStandings(selectedTournament);
-    }
-  }, [selectedTournament]);
-
-  async function loadTournaments() {
+  async function loadDashboard() {
     try {
-      setLoading(true);
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) {
-        setTournaments([]);
-        setSelectedTournament(null);
-        setStandings([]);
-        return;
-      }
+      if (!user) return;
 
-      const list = await TournamentService.getAll(user.id);
+      setUserName(user.email?.split("@")[0] ?? "Player");
 
-      setTournaments(list);
+      const tournaments = await TournamentService.getAll(user.id);
 
-      if (list.length > 0) {
-        setSelectedTournament((current) => current ?? list[0].id);
-      } else {
-        setSelectedTournament(null);
-        setStandings([]);
-      }
-    } catch (error) {
-      console.error(error);
-      setTournaments([]);
-      setSelectedTournament(null);
-      setStandings([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadStandings(tournamentId: number) {
-    try {
-      setLoading(true);
-
-      const [matches, teams] = await Promise.all([
-        MatchService.getByTournament(tournamentId),
-        TournamentService.getRegisteredTeams(tournamentId),
+      const [teams, players] = await Promise.all([
+        TeamService.getCount(user.id),
+        PlayerService.getCount(user.id),
       ]);
 
-      setStandings(
-        StandingService.calculate(
-          matches as Match[],
-          teams as Team[]
-        )
-      );
+      let totalMatches = 0;
+
+      const upcoming: Match[] = [];
+      const finished: Match[] = [];
+
+      for (const tournament of tournaments) {
+        const matches =
+          await MatchService.getByTournament(
+            tournament.id
+          );
+
+        totalMatches += matches.length;
+
+        if (upcoming.length < 5) {
+          const pending =
+            await MatchService.getUpcomingByTournament(
+              tournament.id,
+              5 - upcoming.length
+            );
+
+          upcoming.push(...pending);
+        }
+
+        if (finished.length < 5) {
+          const recent =
+            await MatchService.getRecentResultsByTournament(
+              tournament.id,
+              5 - finished.length
+            );
+
+          finished.push(...recent);
+        }
+      }
+
+      setUpcomingMatches(upcoming);
+      setLatestResults(finished);
+
+      setStats({
+        tournaments: tournaments.length,
+        active: tournaments.filter(
+          (t) => t.status === "Active"
+        ).length,
+        finished: tournaments.filter(
+          (t) => t.status === "Finished"
+        ).length,
+        teams,
+        players,
+        matches: totalMatches,
+      });
     } catch (error) {
       console.error(error);
-      setStandings([]);
-    } finally {
-      setLoading(false);
     }
-  }
-
-  return (
-    <div className="space-y-6">
+  }  return (
+    <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Standings</h1>
+        <h1 className="text-4xl font-bold">
+          Welcome back, {userName} 👋
+        </h1>
 
-        <p className="text-muted-foreground">
-          Current tournament standings.
+        <p className="mt-2 text-muted-foreground">
+          Manage your tournaments, teams and competitions.
         </p>
       </div>
 
-      <div>
-        <select
-          className="rounded-md border bg-background px-3 py-2"
-          value={selectedTournament ?? ""}
-          onChange={(e) =>
-            setSelectedTournament(Number(e.target.value))
-          }
-          disabled={tournaments.length === 0}
-        >
-          {tournaments.length === 0 ? (
-            <option value="">No tournaments</option>
-          ) : (
-            tournaments.map((tournament) => (
-              <option
-                key={tournament.id}
-                value={tournament.id}
-              >
-                {tournament.name}
-              </option>
-            ))
-          )}
-        </select>
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          title="Tournaments"
+          value={stats.tournaments}
+          icon={Trophy}
+          iconClassName="text-yellow-500"
+        />
+
+        <StatCard
+          title="Active"
+          value={stats.active}
+          icon={Activity}
+          iconClassName="text-green-500"
+        />
+
+        <StatCard
+          title="Finished"
+          value={stats.finished}
+          icon={CalendarDays}
+          iconClassName="text-blue-500"
+        />
+
+        <StatCard
+          title="Teams"
+          value={stats.teams}
+          icon={Users}
+          iconClassName="text-purple-500"
+        />
+
+        <StatCard
+          title="Players"
+          value={stats.players}
+          icon={User}
+          iconClassName="text-cyan-500"
+        />
+
+        <StatCard
+          title="Matches"
+          value={stats.matches}
+          icon={Swords}
+          iconClassName="text-red-500"
+        />
       </div>
 
-      <div className="rounded-xl border p-6">
-        <StandingsTable
-          standings={standings}
-          loading={loading}
-        />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <UpcomingMatches matches={upcomingMatches} />
+
+        <LatestResults matches={latestResults} />
+
+        <div className="lg:col-span-2">
+          <RecentActivity
+            items={[
+              {
+                id: 1,
+                icon: "tournament",
+                title: `${stats.tournaments} Tournament(s)`,
+                description:
+                  "Total tournaments created.",
+              },
+              {
+                id: 2,
+                icon: "team",
+                title: `${stats.teams} Team(s)`,
+                description:
+                  "Registered across your tournaments.",
+              },
+              {
+                id: 3,
+                icon: "match",
+                title: `${stats.matches} Match(es)`,
+                description:
+                  "Fixtures generated so far.",
+              },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );
