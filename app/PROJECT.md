@@ -1,217 +1,246 @@
-# PROJECT.md
-
 # AllSports League
+Version: v0.15-alpha
+Status: Stable
+Last Updated: July 2026
 
-## Información general
+---
 
-**Proyecto:** AllSports League
+# Project Overview
 
-**Versión actual:** v0.3.2-alpha
+AllSports League (ASL) is a sports tournament management platform built with Next.js 16, React 19, TypeScript and Supabase.
 
-**Sprint actual:** ASL-029
+The goal is to provide a complete platform for managing:
 
-**Estado:** Estable (Build limpio)
+- Tournaments
+- Teams
+- Players
+- Fixtures
+- Results
+- Standings
+- Dashboard
+- Authentication
+- Public Pages
+- Playoffs
+- Statistics
 
 ---
 
 # Stack
 
-* Next.js 16
-* React 19
-* TypeScript (strict)
-* TailwindCSS
-* Supabase
-* Base UI / shadcn-ui
-* Lucide Icons
+- Next.js 16 (App Router)
+- React 19
+- TypeScript (strict)
+- TailwindCSS
+- Base UI
+- Lucide Icons
+- Supabase
+- Supabase Auth
+- Supabase Storage
 
 ---
 
-# Arquitectura
+# Architecture
 
-## app/
+app/
+components/
+features/
+services/
+lib/
+public/
 
-Solo contiene páginas.
+Every new feature should live inside features/.
 
-No debe contener lógica de negocio.
+Services are responsible for Supabase.
 
----
-
-## features/
-
-Contiene toda la lógica de negocio organizada por módulos.
-
-Módulos actuales:
-
-* auth
-* dashboard
-* matches
-* players
-* standings
-* teams
-* tournaments
+Pages only orchestrate components.
 
 ---
 
-## services/
-
-Los servicios de la raíz existen únicamente como punto de acceso cuando es necesario.
-
-La implementación real debe vivir dentro de `features`.
-
-Ejemplo:
-
-* `features/players/services/player.service.ts` ← implementación
-* `services/player.service.ts` ← reexport
-
-No duplicar lógica entre ambos.
-
----
-
-## lib/
-
-Contiene:
-
-* supabase
-* types
-* utils
-
----
-
-## components/
-
-Componentes UI reutilizables.
-
----
-
-# Módulos implementados
+# Current Modules
 
 ## Authentication
 
-* Login
-* Sign Up
-* Forgot Password
-* Reset Password
+✅ Login
+
+✅ Signup
+
+✅ Forgot Password
+
+✅ Reset Password
 
 ---
 
 ## Dashboard
 
-* Estadísticas principales
-* StatCard reutilizable
-* Bienvenida dinámica
+✅ Stats Cards
 
-Pendiente:
+✅ Latest Results
 
-* Próximos partidos
-* Últimos resultados
-* Actividad reciente
-* Widgets
-* Métricas
+✅ Upcoming Matches
+
+✅ Recent Activity
 
 ---
 
 ## Teams
 
-* CRUD
-* Logos
-* Banners
-* Detalle del equipo
+✅ CRUD
+
+✅ Logo Upload
+
+✅ Banner Upload
+
+✅ Team Header
+
+✅ Team Members
 
 ---
 
 ## Players
 
-* CRUD
-* Avatar
-* Búsqueda
-* PlayerService
-* Team Players
+✅ CRUD
+
+✅ Avatar Upload
+
+✅ Team Players
 
 ---
 
 ## Tournaments
 
-* CRUD
-* Registro de equipos
-* Equipos registrados
+✅ CRUD
+
+✅ Register Teams
+
+✅ Fixtures Generator
+
+✅ Tournament Details
 
 ---
 
 ## Matches
 
-* Round Robin
-* MatchService
-* MatchResultDialog
-* Edit Result
-* Save Result
-* Finish Match
-* Reopen Match
-* Refresh automático
+✅ Generate Fixtures
+
+✅ Enter Results
+
+✅ Match Result Dialog
 
 ---
 
 ## Standings
 
-* StandingService
-* StandingsPage
-* StandingsTable
-* Cálculo dinámico
+✅ Automatic calculation
+
+✅ Dynamic table
 
 ---
 
-# Convenciones
+# Current Sprint
 
-* TypeScript strict.
-* Sin `any` innecesarios.
-* Componentes reutilizables.
-* No romper funcionalidades existentes.
-* Mantener separación por módulos.
-* Un archivo por respuesta.
-* Archivo completo.
-* Esperar siempre `npm run build`.
+ASL-015
 
----
+Current objective:
 
-# Flujo de trabajo
+Replace all Team IDs with real team information.
 
-Antes de modificar cualquier archivo:
+Show:
 
-1. Verificar si existe otro archivo con el mismo nombre.
-2. Confirmar la ruta correcta.
-3. Modificar únicamente un archivo.
-4. Esperar el resultado del build.
+- Team name
+- Team logo
+- Team statistics
 
-Nunca asumir contenido de archivos no vistos.
+Never display:
 
----
+Team #1
 
-# Estado actual
+Team #2
 
-Build:
+Unknown Team
 
-✅ Compila correctamente.
-
-Última verificación:
-
-* Next.js Build: OK
-* TypeScript: OK
+Loading...
 
 ---
 
-# Próximo Sprint (ASL-029)
+# Build Status
 
-Objetivo principal:
+npm run build
 
-Dashboard Avanzado.
+✅ Compiles successfully
 
-Orden recomendado:
+TypeScript
 
-1. Dashboard widgets.
-2. Próximos partidos.
-3. Últimos resultados.
-4. Actividad reciente.
-5. Dashboard charts.
-6. Knockout Bracket.
-7. Live Matches.
-8. Estadísticas avanzadas.
-9. Realtime.
+✅ No errors
+
+---
+
+# Coding Rules
+
+Always preserve architecture.
+
+Never rewrite working modules unnecessarily.
+
+One sprint at a time.
+
+Maximum one file replacement per response.
+
+Always return COMPLETE files.
+
+Never return partial code unless explicitly requested.
+
+Every file delivered must compile.
+
+Always run:
+
+npm run build
+
+after every sprint.
+
+---
+
+# Next Sprints
+
+ASL-015
+Improve TeamService
+Real team information everywhere
+
+ASL-016
+Public Team Profile
+
+ASL-017
+Public Player Profile
+
+ASL-018
+Tournament Public Page
+
+ASL-019
+Playoffs
+
+ASL-020
+Player Statistics
+
+ASL-021
+Tournament Statistics
+
+ASL-022
+Notifications
+
+ASL-023
+Admin Panel
+
+ASL-024
+Deployment
+
+---
+
+Current Stability
+
+9.5 / 10
+
+Architecture
+
+Stable
+
+Production Ready
+
+Approximately 90%

@@ -52,7 +52,9 @@ export class TeamService {
     return data.name;
   }
 
-  static async getNames(ids: number[]): Promise<Record<number, string>> {
+  static async getNames(
+    ids: number[]
+  ): Promise<Record<number, string>> {
     if (ids.length === 0) return {};
 
     const { data, error } = await supabase
@@ -62,10 +64,55 @@ export class TeamService {
 
     if (error) throw error;
 
-    return (data ?? []).reduce<Record<number, string>>((acc, team) => {
-      acc[team.id] = team.name;
-      return acc;
-    }, {});
+    return (data ?? []).reduce<Record<number, string>>(
+      (acc, team) => {
+        acc[team.id] = team.name;
+        return acc;
+      },
+      {}
+    );
+  }
+
+  static async getBasicInfos(
+    ids: number[]
+  ): Promise<
+    Record<
+      number,
+      {
+        id: number;
+        name: string;
+        logo_url: string | null;
+      }
+    >
+  > {
+    if (ids.length === 0) return {};
+
+    const { data, error } = await supabase
+      .from("teams")
+      .select("id,name,logo_url")
+      .in("id", ids);
+
+    if (error) throw error;
+
+    return (data ?? []).reduce(
+      (acc, team) => {
+        acc[team.id] = {
+          id: team.id,
+          name: team.name,
+          logo_url: team.logo_url,
+        };
+
+        return acc;
+      },
+      {} as Record<
+        number,
+        {
+          id: number;
+          name: string;
+          logo_url: string | null;
+        }
+      >
+    );
   }
 
   static async create(
