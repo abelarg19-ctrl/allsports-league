@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -19,7 +20,7 @@ export default function TeamProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadTeam();
+    void loadTeam();
   }, []);
 
   async function loadTeam() {
@@ -33,35 +34,39 @@ export default function TeamProfilePage() {
     }
   }
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
-  if (!team) return <p>Team not found.</p>;
+  if (!team) {
+    return <p>Team not found.</p>;
+  }
 
   return (
     <div className="space-y-6">
       <TeamHeader
         team={team}
-        onLogoUploaded={(logoUrl) =>
-          setTeam({
-            ...team,
-            logo_url: logoUrl,
-          })
-        }
-        onTeamUpdated={(updatedTeam) => setTeam(updatedTeam)}
+        readOnly
       />
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="p-6">
             <p className="text-muted-foreground">Wins</p>
-            <h2 className="text-4xl font-bold">{team.wins}</h2>
+            <h2 className="text-4xl font-bold">
+              {team.wins}
+            </h2>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">Losses</p>
-            <h2 className="text-4xl font-bold">{team.losses}</h2>
+            <p className="text-muted-foreground">
+              Losses
+            </p>
+            <h2 className="text-4xl font-bold">
+              {team.losses}
+            </h2>
           </CardContent>
         </Card>
 
@@ -71,8 +76,13 @@ export default function TeamProfilePage() {
               <Trophy className="text-yellow-500" />
 
               <div>
-                <p className="text-muted-foreground">ELO</p>
-                <h2 className="text-4xl font-bold">{team.elo}</h2>
+                <p className="text-muted-foreground">
+                  ELO
+                </p>
+
+                <h2 className="text-4xl font-bold">
+                  {team.elo}
+                </h2>
               </div>
             </div>
           </CardContent>
@@ -83,10 +93,13 @@ export default function TeamProfilePage() {
 
       <Card>
         <CardContent className="p-8">
-          <h2 className="mb-4 text-2xl font-bold">About</h2>
+          <h2 className="mb-4 text-2xl font-bold">
+            About
+          </h2>
 
           <p className="text-muted-foreground">
-            {team.description || "No description yet."}
+            {team.description ||
+              "No description yet."}
           </p>
         </CardContent>
       </Card>
