@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { getSupabaseErrorMessage } from "@/lib/supabase-error";
 import { Match } from "@/lib/types";
 import { TournamentService } from "@/services/tournament.service";
 
@@ -13,7 +14,9 @@ export class MatchService {
       .order("round")
       .order("id");
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return (data ?? []) as Match[];
   }
@@ -31,7 +34,9 @@ export class MatchService {
       .order("id")
       .limit(limit);
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return (data ?? []) as Match[];
   }
@@ -48,7 +53,9 @@ export class MatchService {
       .order("id", { ascending: false })
       .limit(limit);
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return (data ?? []) as Match[];
   }
@@ -60,21 +67,23 @@ export class MatchService {
       .eq("id", id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return data as Match;
   }
 
-  static async create(
-    match: Omit<Match, "id">
-  ): Promise<Match> {
+  static async create(match: Omit<Match, "id">): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
       .insert(match)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return data as Match;
   }
@@ -90,7 +99,9 @@ export class MatchService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return data as Match;
   }
@@ -116,7 +127,9 @@ export class MatchService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return data as Match;
   }
@@ -124,14 +137,14 @@ export class MatchService {
   static async finishMatch(id: number): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
-      .update({
-        status: "Finished",
-      })
+      .update({ status: "Finished" })
       .eq("id", id)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return data as Match;
   }
@@ -139,14 +152,14 @@ export class MatchService {
   static async reopenMatch(id: number): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
-      .update({
-        status: "Pending",
-      })
+      .update({ status: "Pending" })
       .eq("id", id)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
 
     return data as Match;
   }
@@ -157,7 +170,9 @@ export class MatchService {
       .delete()
       .eq("id", id);
 
-    if (error) throw error;
+    if (error) {
+      throw new Error(getSupabaseErrorMessage(error));
+    }
   }
 
   static async generateRoundRobin(
