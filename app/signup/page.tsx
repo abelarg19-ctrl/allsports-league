@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -64,15 +65,17 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-950 px-6">
-        <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center">
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-10 text-center backdrop-blur-2xl">
 
-          <h1 className="text-3xl font-bold text-white">
+          <CheckCircle2 className="mx-auto h-16 w-16 text-green-400" />
+
+          <h1 className="mt-6 text-4xl font-black">
             Check your email
           </h1>
 
           <p className="mt-4 text-gray-400">
-            Your account has been created.
+            Your account has been created successfully.
           </p>
 
           <p className="mt-2 text-gray-400">
@@ -80,7 +83,7 @@ export default function SignUpPage() {
           </p>
 
           <Link href="/login">
-            <Button className="mt-8 w-full">
+            <Button className="mt-8 w-full bg-gradient-to-r from-cyan-500 to-blue-600">
               Back to Sign In
             </Button>
           </Link>
@@ -91,20 +94,22 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-950 px-6">
-      <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-8">
+    <main className="flex min-h-screen items-center justify-center px-6">
+      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-10 backdrop-blur-2xl">
 
-        <h1 className="text-center text-3xl font-bold text-white">
-          Create Account
-        </h1>
+        <div className="text-center">
 
-        <p className="mt-2 text-center text-sm text-gray-400">
-          Join AllSports League
-        </p>
+          <h1 className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-4xl font-black text-transparent">
+            Create Account
+          </h1>
 
-        <div className="mt-8 space-y-4">
+          <p className="mt-3 text-gray-400">
+            Join AllSports League
+          </p>
 
-          <Input
+        </div>
+
+        <div className="mt-10 space-y-5">          <Input
             placeholder="Full Name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -128,33 +133,41 @@ export default function SignUpPage() {
             type="password"
             placeholder="Confirm Password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
           />
 
           {error && (
-            <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-400">
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
               {error}
             </div>
           )}
 
           <Button
-            className="w-full"
+            className="h-12 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-base font-semibold transition hover:scale-[1.02]"
             onClick={handleSignUp}
             disabled={loading}
           >
-            {loading ? "Creating Account..." : "Create Account"}
+            {loading
+              ? "Creating Account..."
+              : "Create Account"}
+
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
 
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div className="mt-8 text-center text-sm text-gray-400">
           Already have an account?{" "}
+
           <Link
             href="/login"
-            className="font-semibold text-blue-400 hover:text-blue-300"
+            className="font-semibold text-cyan-400 hover:text-cyan-300"
           >
             Sign In
           </Link>
+
         </div>
 
       </div>

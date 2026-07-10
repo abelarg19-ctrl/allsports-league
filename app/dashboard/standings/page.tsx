@@ -52,7 +52,8 @@ export default function Dashboard() {
 
       setUserName(user.email?.split("@")[0] ?? "Player");
 
-      const tournaments = await TournamentService.getAll(user.id);
+      const tournaments =
+  await TournamentService.getAccessibleTournaments(user.id);
 
       const [teams, players] = await Promise.all([
         TeamService.getCount(user.id),

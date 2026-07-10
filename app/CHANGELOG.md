@@ -1,64 +1,84 @@
-# CHANGELOG.md
+# CHANGELOG
 
-# v0.18-alpha
+## v0.19-alpha
 
-## ASL-021 (En progreso)
+### Added
 
-### UI Premium
-
-* Rediseño de StatCard.
-* Rediseño de RegisteredTeamsList.
-* Rediseño de UpcomingMatches.
-* Rediseño de LatestResults.
-* Rediseño de RecentActivity.
-* Rediseño de TournamentMatchesList.
-* Nuevo fondo global premium.
-* Glassmorphism.
-* Gradientes modernos.
-* Mejor tipografía.
-* Mejor espaciado.
-* Hover animations.
-* Componentes visuales consistentes.
-
----
-
-## ASL-020
-
-### Diseño
-
-* Eliminación progresiva del estilo antiguo.
-* Tarjetas modernas.
-* Mejor experiencia visual.
-* Diseño responsive.
+- Premium Player Profile.
+- Player Header.
+- Player Stats.
+- Player Bio.
+- Player Teams.
+- Player Match History.
+- Player Achievements.
+- Match Center.
+- Match Timeline.
+- Match Statistics.
+- Match Events.
+- Match MVP.
+- Match Lineups.
+- Premium Standings Podium.
+- Standings Filters.
+- Standings Statistics.
+- Premium Standings Table.
+- Tournament Header.
+- Tournament Statistics.
+- Premium Tournament Match Cards.
 
 ---
 
-## ASL-019
+### Improved
 
-### Seguridad
-
-* Partidos finalizados bloqueados desde la interfaz.
-* Inputs deshabilitados para partidos finalizados.
-* Indicador visual de bloqueo.
-* Preparación para políticas RLS.
-* Solo el propietario del torneo podrá modificar resultados.
-
----
-
-## ASL-018
-
-### Plataforma pública
-
-* Base preparada para perfiles públicos de torneos.
-* Nuevos métodos públicos en servicios.
-* Arquitectura preparada para reutilizar componentes existentes.
+- Dashboard UI.
+- Team UI.
+- Player UI.
+- Tournament UI.
+- Match UI.
+- Standings UI.
+- Global Premium Theme.
+- Glassmorphism.
+- Responsive Layout.
+- Card Animations.
+- Hover Effects.
 
 ---
 
-## Estado
+### Security
 
-* Proyecto estable.
-* `npm run build` compila correctamente.
-* Sin cambios masivos.
-* Arquitectura respetada.
-* Desarrollo incremental.
+- Tournament Admin integration continued.
+- Protected tournament management.
+- Protected match management.
+- Better reusable services.
+
+---
+
+### Refactoring
+
+- TeamService improvements.
+- TournamentService improvements.
+- MatchService improvements.
+- PlayerService improvements.
+- Reusable Premium Components.
+
+---
+
+### Fixed
+
+- Multiple TypeScript issues.
+- Build issues.
+- Import issues.
+- Route issues.
+- Match navigation.
+- Premium component integration.
+
+---
+
+### Current Status
+
+Project Compiles Successfully ✅
+
+Premium UI Expansion In Progress.
+
+Tournament Detail Premium is the current objective.
+
+Closed Beta preparation continues.

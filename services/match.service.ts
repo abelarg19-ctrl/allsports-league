@@ -9,13 +9,29 @@ export class MatchService {
   ): Promise<Match[]> {
     const { data, error } = await supabase
       .from("matches")
-      .select("*")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
       .eq("tournament_id", tournamentId)
-      .order("round")
-      .order("id");
+      .order("round", {
+        ascending: true,
+      })
+      .order("id", {
+        ascending: true,
+      });
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return (data ?? []) as Match[];
@@ -27,15 +43,31 @@ export class MatchService {
   ): Promise<Match[]> {
     const { data, error } = await supabase
       .from("matches")
-      .select("*")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
       .eq("tournament_id", tournamentId)
       .eq("status", "Pending")
-      .order("round")
-      .order("id")
+      .order("round", {
+        ascending: true,
+      })
+      .order("id", {
+        ascending: true,
+      })
       .limit(limit);
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return (data ?? []) as Match[];
@@ -47,34 +79,64 @@ export class MatchService {
   ): Promise<Match[]> {
     const { data, error } = await supabase
       .from("matches")
-      .select("*")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
       .eq("tournament_id", tournamentId)
       .eq("status", "Finished")
-      .order("id", { ascending: false })
+      .order("id", {
+        ascending: false,
+      })
       .limit(limit);
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return (data ?? []) as Match[];
   }
 
-  static async getById(id: number): Promise<Match> {
+  static async getById(
+    id: number
+  ): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
-      .select("*")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
       .eq("id", id)
       .single();
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return data as Match;
   }
 
-  static async create(match: Omit<Match, "id">): Promise<Match> {
+  static async create(
+    match: Omit<Match, "id">
+  ): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
       .insert(match)
@@ -82,7 +144,9 @@ export class MatchService {
       .single();
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return data as Match;
@@ -92,6 +156,10 @@ export class MatchService {
     id: number,
     updates: Partial<Match>
   ): Promise<Match> {
+    if (Object.keys(updates).length === 0) {
+      return this.getById(id);
+    }
+
     const { data, error } = await supabase
       .from("matches")
       .update(updates)
@@ -100,13 +168,13 @@ export class MatchService {
       .single();
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return data as Match;
-  }
-
-  static async updateResult(
+  }  static async updateResult(
     id: number,
     homeScore: number,
     awayScore: number
@@ -128,50 +196,68 @@ export class MatchService {
       .single();
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return data as Match;
   }
 
-  static async finishMatch(id: number): Promise<Match> {
+  static async finishMatch(
+    id: number
+  ): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
-      .update({ status: "Finished" })
+      .update({
+        status: "Finished",
+      })
       .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return data as Match;
   }
 
-  static async reopenMatch(id: number): Promise<Match> {
+  static async reopenMatch(
+    id: number
+  ): Promise<Match> {
     const { data, error } = await supabase
       .from("matches")
-      .update({ status: "Pending" })
+      .update({
+        status: "Pending",
+      })
       .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
 
     return data as Match;
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(
+    id: number
+  ): Promise<void> {
     const { error } = await supabase
       .from("matches")
       .delete()
       .eq("id", id);
 
     if (error) {
-      throw new Error(getSupabaseErrorMessage(error));
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
   }
 
@@ -184,14 +270,22 @@ export class MatchService {
       );
 
     if (teams.length < 2) {
-      throw new Error("At least 2 teams are required.");
+      throw new Error(
+        "At least 2 teams are required."
+      );
     }
+
+    const matches: Omit<Match, "id">[] = [];
 
     let round = 1;
 
     for (let i = 0; i < teams.length; i++) {
-      for (let j = i + 1; j < teams.length; j++) {
-        await this.create({
+      for (
+        let j = i + 1;
+        j < teams.length;
+        j++
+      ) {
+        matches.push({
           tournament_id: tournamentId,
           home_team_id: teams[i].id,
           away_team_id: teams[j].id,
@@ -204,6 +298,16 @@ export class MatchService {
 
         round++;
       }
+    }
+
+    const { error } = await supabase
+      .from("matches")
+      .insert(matches);
+
+    if (error) {
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
     }
   }
 }

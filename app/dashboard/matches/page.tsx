@@ -18,16 +18,28 @@ type TeamMap = {
   };
 };
 
+type MatchWithTournament = Match & {
+  tournamentName: string;
+  canEdit: boolean;
+};
+
 export default function MatchesPage() {
   const [loading, setLoading] = useState(true);
-  const [matches, setMatches] = useState<Match[]>([]);
+
+  const [matches, setMatches] = useState<
+    MatchWithTournament[]
+  >([]);
+
   const [teams, setTeams] = useState<TeamMap>({});
 
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] =
+    useState<MatchWithTournament | null>(null);
+
+  const [dialogOpen, setDialogOpen] =
+    useState(false);
 
   useEffect(() => {
-    loadMatches();
+    void loadMatches();
   }, []);
 
   async function loadMatches() {
@@ -40,18 +52,29 @@ export default function MatchesPage() {
 
       if (!user) return;
 
-      const tournaments = await TournamentService.getAll(user.id);
+     const tournaments =
+  await TournamentService.getAccessibleTournaments(user.id);
 
-      const allMatches: Match[] = [];
+      const allMatches: MatchWithTournament[] = [];
 
       for (const tournament of tournaments as Tournament[]) {
-        const list = await MatchService.getByTournament(tournament.id);
+        const list =
+          await MatchService.getByTournament(
+            tournament.id
+          );
+
+        const canEdit =
+          await TournamentService.isTournamentAdmin(
+            tournament.id,
+            user.id
+          );
 
         list.forEach((match) =>
           allMatches.push({
             ...match,
             tournamentName: tournament.name,
-          } as Match)
+            canEdit,
+          })
         );
       }
 
@@ -87,7 +110,11 @@ export default function MatchesPage() {
     }
   }
 
-  function openResultDialog(match: Match) {
+  function openResultDialog(
+    match: MatchWithTournament
+  ) {
+    if (!match.canEdit) return;
+
     setSelectedMatch(match);
     setDialogOpen(true);
   }
@@ -98,15 +125,18 @@ export default function MatchesPage() {
 
   return (
     <div className="space-y-6">
+
       <div>
-        <h1 className="text-3xl font-bold">Matches</h1>
+
+        <h1 className="text-3xl font-bold">
+          Matches
+        </h1>
 
         <p className="text-muted-foreground">
           All generated tournament matches.
         </p>
-      </div>
 
-      {loading ? (
+      </div>      {loading ? (
         <p>Loading...</p>
       ) : matches.length === 0 ? (
         <div className="rounded-xl border p-8">
@@ -120,9 +150,10 @@ export default function MatchesPage() {
               className="rounded-xl border p-5"
             >
               <div className="flex items-center justify-between">
+
                 <div>
                   <h2 className="font-semibold">
-                    {(match as any).tournamentName}
+                    {match.tournamentName}
                   </h2>
 
                   <p className="text-sm text-muted-foreground">
@@ -131,22 +162,31 @@ export default function MatchesPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
+
                   <span className="rounded bg-gray-800 px-3 py-1 text-sm">
                     {match.status}
                   </span>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openResultDialog(match)}
-                  >
-                    Edit Result
-                  </Button>
+                  {match.canEdit && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        openResultDialog(match)
+                      }
+                    >
+                      Edit Result
+                    </Button>
+                  )}
+
                 </div>
+
               </div>
 
               <div className="mt-6 flex items-center justify-between">
+
                 <div className="flex w-2/5 items-center gap-3">
+
                   <img
                     src={
                       teams[match.home_team_id]?.logo_url ??
@@ -157,11 +197,14 @@ export default function MatchesPage() {
                   />
 
                   <span className="font-semibold">
-                    {teams[match.home_team_id]?.name ?? "Unknown"}
+                    {teams[match.home_team_id]?.name ??
+                      "Unknown"}
                   </span>
+
                 </div>
 
                 <div className="text-center">
+
                   <div className="text-2xl font-bold">
                     {match.home_score} - {match.away_score}
                   </div>
@@ -169,11 +212,14 @@ export default function MatchesPage() {
                   <div className="text-xs text-muted-foreground">
                     VS
                   </div>
+
                 </div>
 
                 <div className="flex w-2/5 items-center justify-end gap-3">
+
                   <span className="font-semibold">
-                    {teams[match.away_team_id]?.name ?? "Unknown"}
+                    {teams[match.away_team_id]?.name ??
+                      "Unknown"}
                   </span>
 
                   <img
@@ -184,8 +230,11 @@ export default function MatchesPage() {
                     className="h-12 w-12 rounded-full border object-cover"
                     alt=""
                   />
+
                 </div>
+
               </div>
+
             </div>
           ))}
         </div>
@@ -199,6 +248,7 @@ export default function MatchesPage() {
           onSaved={handleSaved}
         />
       )}
+
     </div>
   );
 }

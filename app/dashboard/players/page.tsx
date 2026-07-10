@@ -1,35 +1,75 @@
+import { Shield, Sparkles, Users } from "lucide-react";
+
 export default function PlayersPage() {
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Players</h1>
+    <div className="mx-auto max-w-6xl space-y-8">
 
-        <p className="mt-2 text-muted-foreground">
-          The public Player Profile module is currently under development.
+      <div>
+        <h1 className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-5xl font-black text-transparent">
+          Players
+        </h1>
+
+        <p className="mt-3 text-lg text-gray-400">
+          Player management and public profiles.
         </p>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-8">
-        <h2 className="mb-3 text-xl font-semibold">
-          Coming Soon
+      <div className="grid gap-6 lg:grid-cols-3">
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+          <Users className="mb-5 h-12 w-12 text-cyan-400" />
+
+          <h2 className="text-2xl font-bold">
+            Player Profiles
+          </h2>
+
+          <p className="mt-3 text-gray-400">
+            Public player pages with avatars, biography, teams,
+            statistics and achievements.
+          </p>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+          <Shield className="mb-5 h-12 w-12 text-green-400" />
+
+          <h2 className="text-2xl font-bold">
+            Team Management
+          </h2>
+
+          <p className="mt-3 text-gray-400">
+            Players are currently managed inside each team's
+            profile.
+          </p>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+          <Sparkles className="mb-5 h-12 w-12 text-yellow-400" />
+
+          <h2 className="text-2xl font-bold">
+            Coming Soon
+          </h2>
+
+          <p className="mt-3 text-gray-400">
+            Match history, trophies, MVP awards,
+            goals, assists, ELO and advanced statistics.
+          </p>
+        </div>
+
+      </div>
+
+      <div className="rounded-3xl border border-cyan-500/20 bg-cyan-500/10 p-8 backdrop-blur-xl">
+        <h2 className="text-2xl font-bold">
+          Next Major Update
         </h2>
 
-        <p className="text-muted-foreground">
-          The next update will introduce public player profiles with avatars,
-          personal information, team details, statistics, and match history.
+        <p className="mt-3 text-gray-300">
+          The Player module will evolve into a complete profile
+          system similar to professional esports and football
+          platforms, with rich statistics, rankings and player
+          history.
         </p>
       </div>
 
-      <div className="rounded-xl border border-border p-8">
-        <h3 className="mb-3 text-lg font-semibold">
-          Current Player Management
-        </h3>
-
-        <p className="text-muted-foreground">
-          Players can currently be created and managed from each team's profile
-          through the <strong>Players</strong> section.
-        </p>
-      </div>
     </div>
   );
 }

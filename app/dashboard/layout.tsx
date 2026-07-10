@@ -1,4 +1,45 @@
 import Link from "next/link";
+import {
+  Activity,
+  CalendarDays,
+  House,
+  Shield,
+  Trophy,
+  Users,
+} from "lucide-react";
+
+const links = [
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: House,
+  },
+  {
+    href: "/dashboard/tournaments",
+    label: "Tournaments",
+    icon: Trophy,
+  },
+  {
+    href: "/dashboard/teams",
+    label: "Teams",
+    icon: Shield,
+  },
+  {
+    href: "/dashboard/players",
+    label: "Players",
+    icon: Users,
+  },
+  {
+    href: "/dashboard/matches",
+    label: "Matches",
+    icon: Activity,
+  },
+  {
+    href: "/dashboard/standings",
+    label: "Standings",
+    icon: CalendarDays,
+  },
+];
 
 export default function DashboardLayout({
   children,
@@ -6,65 +47,42 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-gray-950 text-white">
-      <aside className="w-64 border-r border-gray-800 bg-gray-900 p-6">
-        <h1 className="mb-8 text-xl font-bold">
-          ⚽ AllSports League
-        </h1>
+    <div className="flex min-h-screen text-white">
+      <aside className="sticky top-0 flex h-screen w-72 flex-col border-r border-white/10 bg-black/25 backdrop-blur-2xl">
+        <div className="border-b border-white/10 p-8">
+          <h1 className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-3xl font-black text-transparent">
+            AllSports League
+          </h1>
 
-        <nav className="space-y-3">
-  <Link
-    href="/dashboard"
-    className="block text-gray-300 hover:text-white"
-  >
-    Dashboard
-  </Link>
+          <p className="mt-2 text-sm text-gray-400">
+            Premium Dashboard
+          </p>
+        </div>
 
-  <Link
-    href="/dashboard/tournaments"
-    className="block text-gray-300 hover:text-white"
-  >
-    Tournaments
-  </Link>
+        <nav className="flex-1 space-y-2 p-5">
+          {links.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-gray-300 transition-all duration-300 hover:bg-cyan-500/10 hover:text-cyan-300 hover:translate-x-1"
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </Link>
+          ))}
 
-  <Link
-    href="/dashboard/teams"
-    className="block text-gray-300 hover:text-white"
-  >
-    Teams
-  </Link>
-
-  <Link
-    href="/dashboard/players"
-    className="block text-gray-300 hover:text-white"
-  >
-    Players
-  </Link>
-
-  <Link
-    href="/dashboard/matches"
-    className="block text-gray-300 hover:text-white"
-  >
-    Matches
-  </Link>
-
-  <Link
-    href="/dashboard/standings"
-    className="block text-gray-300 hover:text-white"
-  >
-    Standings
-  </Link>
-
-  <Link
-    href="/dashboard/create"
-    className="block text-gray-300 hover:text-white"
-  >
-    Create Tournament
-  </Link>
-</nav>
+          <div className="pt-4">
+            <Link
+              href="/dashboard/create"
+              className="flex items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 font-semibold transition hover:scale-[1.02]"
+            >
+              Create Tournament
+            </Link>
+          </div>
+        </nav>
       </aside>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 lg:p-10">
         {children}
       </main>
     </div>

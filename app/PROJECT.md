@@ -1,186 +1,244 @@
-# PROJECT.md
-
 # AllSports League (ASL)
 
-**Versión:** v0.18-alpha
-**Estado:** En desarrollo (estable)
+## Current Version
+
+v0.19-alpha
+
+Stable Build ✅
 
 ---
 
-# Objetivo
+# Vision
 
-Construir una plataforma moderna para la gestión de ligas, torneos, equipos y jugadores, con una arquitectura limpia, escalable y mantenible.
+AllSports League (ASL) is a modern SaaS platform for managing sports leagues, tournaments, teams, players and matches with a premium user experience inspired by professional sports platforms.
 
-La prioridad es siempre mantener el proyecto compilando y evitar cambios que rompan funcionalidades existentes.
-
----
-
-# Stack
-
-* Next.js 16
-* React 19
-* TypeScript (Strict)
-* TailwindCSS
-* Supabase
-* App Router
+Target:
+Closed Beta on Vercel.
 
 ---
 
-# Arquitectura
+# Tech Stack
 
-* app/
-* components/
-* features/
-* services/
-* lib/
-* public/
-
-Todo el código nuevo debe respetar esta estructura.
-
----
-
-# Reglas de desarrollo
-
-* Un sprint a la vez.
-* Máximo un archivo completo por respuesta.
-* Nunca modificar muchos archivos al mismo tiempo.
-* Siempre entregar archivos completos.
-* Reutilizar componentes y servicios existentes.
-* No duplicar lógica.
-* No romper funcionalidades existentes.
-* Evitar el uso de `any`.
-* TypeScript estricto.
-* Analizar antes de modificar.
-* Mantener una arquitectura limpia y modular.
+- Next.js 16
+- React 19
+- TypeScript (Strict)
+- Tailwind CSS 4
+- shadcn/ui
+- Supabase
+- Supabase Storage
+- Lucide Icons
 
 ---
 
-# Flujo de trabajo
+# Development Rules
 
-Al finalizar cada sprint:
-
-```bash
-npm run build
-```
-
-Si existe algún error:
-
-* Resolverlo antes de continuar.
-* No avanzar al siguiente sprint.
-
-Después:
-
-```bash
-git add .
-git commit -m "ASL-XXX descripción"
-git push
-```
-
-Actualizar siempre:
-
-* PROJECT.md
-* CHANGELOG.md
+- Project must always compile.
+- Never break existing features.
+- One sprint at a time.
+- Deliver complete files.
+- Keep TypeScript strict.
+- Reuse components/services.
+- Keep current architecture.
+- Premium UI everywhere.
+- Mobile first.
+- Security first.
 
 ---
 
-# Estado actual
+# Current Architecture
 
-## Completado
+app/
 
-* Authentication
-* Dashboard
-* Teams CRUD
-* Players CRUD
-* Tournament CRUD
-* Fixtures
-* Enter Results
-* Standings
-* Dashboard Statistics
-* Upcoming Matches
-* Latest Results
-* Recent Activity
-* Team Logos
-* Team Banners
-* Perfiles públicos de equipos
-* Perfiles públicos de jugadores
-* Eliminación de Team IDs visibles
+components/
+
+features/
+
+hooks/
+
+lib/
+
+services/
+
+public/
 
 ---
 
-# Seguridad
+# Completed Modules
 
-Resultados protegidos:
+## Authentication
 
-* Solo el propietario del torneo puede modificarlos.
-* Los demás usuarios tienen acceso de solo lectura.
-* Preparado para RLS en Supabase.
-
----
-
-# Diseño
-
-Actualmente migrando a Premium UI.
-
-Incluye:
-
-* Glassmorphism
-* Gradientes
-* Mejor tipografía
-* Animaciones
-* Responsive
-* Componentes reutilizables
+- Login
+- Signup
+- Reset Password
+- Session Management
 
 ---
 
-# Roadmap
+## Dashboard
 
-## ASL-021
+- Premium Dashboard
+- Stat Cards
+- Upcoming Matches
+- Latest Results
+- Recent Activity
 
-Premium UI
+---
 
-* Dashboard Premium
-* Glassmorphism global
-* Hero moderno
-* Componentes visuales reutilizables
-* Skeleton Loaders
+## Teams
 
-## ASL-022
+- CRUD
+- Team Profile
+- Premium Header
+- Logo Upload
+- Banner Upload
+- Team Players
 
-Plataforma pública
+---
 
-* Perfil público de torneos
-* Landing Page
-* Equipos destacados
-* Jugadores destacados
+## Players
 
-## ASL-023
+- CRUD
+- Player Avatars
+- Team Player Management
+- Premium Player Profile
+- Player Header
+- Player Stats
+- Player Bio
+- Player Teams
+- Player Match History
+- Player Achievements
 
-Rankings
+---
 
-* Equipos
-* Jugadores
-* Torneos
+## Tournaments
 
-## ASL-024
+- CRUD
+- Register Teams
+- Generate Fixtures
+- Standings
+- Tournament Admins
+- Premium Tournament Cards
+- Tournament Header
+- Tournament Stats
 
-Búsqueda global
+---
 
-## ASL-025
+## Matches
 
-Notificaciones
+- Round Robin Generator
+- Edit Results
+- Finish Match
+- Reopen Match
+- Premium Match Center
+- Match Timeline
+- Match Statistics
+- Match Events
+- Match MVP
+- Match Lineups
 
-## ASL-026
+---
 
-Admin Center
+## Standings
 
-## ASL-027
+- Premium Table
+- Podium
+- League Stats
+- Filters
 
-Realtime
+---
 
-## ASL-028
+# Security
 
-Performance
+Implemented
 
-## ASL-029
+- Tournament Owner
+- Tournament Admin
+- RLS Policies
+- Protected Match Results
+- Protected Tournament Management
 
-Release v1.0
+---
+
+# UI Status
+
+Completed
+
+- Landing
+- Login
+- Signup
+- Dashboard
+- Sidebar
+- Teams
+- Players
+- Matches
+- Standings
+- Tournaments
+- Global Premium Theme
+
+Pending
+
+- Tournament Detail Premium
+- Mobile Polish
+- Animations
+- Skeleton Loaders
+- Notifications
+- Search
+- Reports
+- Closed Beta Polish
+
+---
+
+# Current Sprint
+
+ASL-031
+
+Tournament Premium Experience
+
+Current work
+
+- Tournament Header
+- Tournament Stats
+- Premium Match Cards
+- Match Center
+- Player Profiles
+
+---
+
+# Next Sprint
+
+- Tournament Detail Premium
+- Tournament Quick Actions
+- Tournament Analytics
+- Notifications
+- Mobile Optimization
+- Final UI Polish
+
+---
+
+# Beta Checklist
+
+Authentication ✅
+
+Dashboard ✅
+
+Teams ✅
+
+Players ✅
+
+Tournaments ✅
+
+Matches ✅
+
+Standings ✅
+
+Permissions ✅
+
+Premium UI ✅ (Almost Complete)
+
+Closed Beta Preparation 🔄
+
+---
+
+# Goal
+
+Release Closed Beta through Vercel with a commercial-quality sports management platform.

@@ -1,20 +1,42 @@
 import { supabase } from "@/lib/supabase";
 import { Team } from "@/lib/types";
 
+type TeamBasicInfo = {
+  id: number;
+  name: string;
+  logo_url: string | null;
+};
+
 export class TeamService {
-  static async getAll(ownerId: string): Promise<Team[]> {
+  static async getAll(
+    ownerId: string
+  ): Promise<Team[]> {
     const { data, error } = await supabase
       .from("teams")
-      .select("*")
+      .select(`
+        id,
+        owner_id,
+        name,
+        tag,
+        logo_url,
+        wins,
+        losses,
+        elo,
+        created_at
+      `)
       .eq("owner_id", ownerId)
-      .order("created_at", { ascending: false });
+      .order("created_at", {
+        ascending: false,
+      });
 
     if (error) throw error;
 
     return (data ?? []) as Team[];
   }
 
-  static async getCount(ownerId: string): Promise<number> {
+  static async getCount(
+    ownerId: string
+  ): Promise<number> {
     const { count, error } = await supabase
       .from("teams")
       .select("*", {
@@ -28,10 +50,26 @@ export class TeamService {
     return count ?? 0;
   }
 
-  static async getById(id: number): Promise<Team> {
+  static async getById(
+    id: number
+  ): Promise<Team> {
     const { data, error } = await supabase
       .from("teams")
-      .select("*")
+      .select(`
+        id,
+        owner_id,
+        name,
+        tag,
+        description,
+        country,
+        website,
+        logo_url,
+        banner_url,
+        wins,
+        losses,
+        elo,
+        created_at
+      `)
       .eq("id", id)
       .single();
 
@@ -40,7 +78,9 @@ export class TeamService {
     return data as Team;
   }
 
-  static async getName(id: number): Promise<string> {
+  static async getName(
+    id: number
+  ): Promise<string> {
     const { data, error } = await supabase
       .from("teams")
       .select("name")
@@ -55,7 +95,9 @@ export class TeamService {
   static async getNames(
     ids: number[]
   ): Promise<Record<number, string>> {
-    if (ids.length === 0) return {};
+    if (ids.length === 0) {
+      return {};
+    }
 
     const { data, error } = await supabase
       .from("teams")
@@ -64,28 +106,21 @@ export class TeamService {
 
     if (error) throw error;
 
-    return (data ?? []).reduce<Record<number, string>>(
-      (acc, team) => {
-        acc[team.id] = team.name;
-        return acc;
-      },
-      {}
-    );
+    const map: Record<number, string> = {};
+
+    for (const team of data ?? []) {
+      map[team.id] = team.name;
+    }
+
+    return map;
   }
 
   static async getBasicInfos(
     ids: number[]
-  ): Promise<
-    Record<
-      number,
-      {
-        id: number;
-        name: string;
-        logo_url: string | null;
-      }
-    >
-  > {
-    if (ids.length === 0) return {};
+  ): Promise<Record<number, TeamBasicInfo>> {
+    if (ids.length === 0) {
+      return {};
+    }
 
     const { data, error } = await supabase
       .from("teams")
@@ -94,30 +129,29 @@ export class TeamService {
 
     if (error) throw error;
 
-    return (data ?? []).reduce(
-      (acc, team) => {
-        acc[team.id] = {
-          id: team.id,
-          name: team.name,
-          logo_url: team.logo_url,
-        };
+    const map: Record<number, TeamBasicInfo> = {};
 
-        return acc;
-      },
-      {} as Record<
-        number,
-        {
-          id: number;
-          name: string;
-          logo_url: string | null;
-        }
-      >
-    );
-  }
+    for (const team of data ?? []) {
+      map[team.id] = {
+        id: team.id,
+        name: team.name,
+        logo_url: team.logo_url,
+      };
+    }
 
-  static async create(
+    return map;
+  }  static async create(
     team: Omit<Team, "id" | "created_at">
   ): Promise<Team> {
+    const alreadyExists = await this.exists(
+      team.owner_id,
+      team.name
+    );
+
+    if (alreadyExists) {
+      throw new Error("A team with this name already exists.");
+    }
+
     const { data, error } = await supabase
       .from("teams")
       .insert(team)
@@ -133,6 +167,10 @@ export class TeamService {
     id: number,
     updates: Partial<Team>
   ): Promise<Team> {
+    if (Object.keys(updates).length === 0) {
+      return this.getById(id);
+    }
+
     const { data, error } = await supabase
       .from("teams")
       .update(updates)
@@ -145,7 +183,9 @@ export class TeamService {
     return data as Team;
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(
+    id: number
+  ): Promise<void> {
     const { error } = await supabase
       .from("teams")
       .delete()
@@ -165,7 +205,7 @@ export class TeamService {
         head: true,
       })
       .eq("owner_id", ownerId)
-      .ilike("name", name);
+      .ilike("name", name.trim());
 
     if (error) throw error;
 

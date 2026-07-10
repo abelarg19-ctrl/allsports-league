@@ -9,8 +9,10 @@ import {
   Users,
   User,
 } from "lucide-react";
+
 import LatestResults from "@/features/dashboard/components/LatestResults";
 import RecentActivity from "@/features/dashboard/components/RecentActivity";
+
 import { supabase } from "@/lib/supabase";
 import { Match } from "@/lib/types";
 
@@ -34,8 +36,11 @@ export default function Dashboard() {
     matches: 0,
   });
 
-  const [userName, setUserName] = useState("Player");
-  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
+  const [userName, setUserName] =
+    useState("Player");
+
+  const [upcomingMatches, setUpcomingMatches] =
+    useState<Match[]>([]);
 
   useEffect(() => {
     void loadDashboard();
@@ -48,27 +53,39 @@ export default function Dashboard() {
 
     if (!user) return;
 
-    setUserName(user.email?.split("@")[0] ?? "Player");
+    setUserName(
+      user.email?.split("@")[0] ?? "Player"
+    );
 
-    const tournaments = await TournamentService.getAll(user.id);
+    const tournaments =
+      await TournamentService.getAccessibleTournaments(
+        user.id
+      );
 
-    const [teams, players] = await Promise.all([
-      TeamService.getCount(user.id),
-      PlayerService.getCount(user.id),
-    ]);
+    const [teams, players] =
+      await Promise.all([
+        TeamService.getCount(user.id),
+        PlayerService.getCount(user.id),
+      ]);
 
     let matches = 0;
+
     const upcoming: Match[] = [];
 
     for (const tournament of tournaments) {
-      const list = await MatchService.getByTournament(tournament.id);
+      const list =
+        await MatchService.getByTournament(
+          tournament.id
+        );
+
       matches += list.length;
 
       if (upcoming.length < 5) {
-        const pending = await MatchService.getUpcomingByTournament(
-          tournament.id,
-          5 - upcoming.length
-        );
+        const pending =
+          await MatchService.getUpcomingByTournament(
+            tournament.id,
+            5 - upcoming.length
+          );
 
         upcoming.push(...pending);
       }
@@ -78,8 +95,12 @@ export default function Dashboard() {
 
     setStats({
       tournaments: tournaments.length,
-      active: tournaments.filter((t) => t.status === "Active").length,
-      finished: tournaments.filter((t) => t.status === "Finished").length,
+      active: tournaments.filter(
+        (t) => t.status === "Active"
+      ).length,
+      finished: tournaments.filter(
+        (t) => t.status === "Finished"
+      ).length,
       teams,
       players,
       matches,
@@ -88,7 +109,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+
       <div>
+
         <h1 className="text-4xl font-bold">
           Welcome back, {userName} 👋
         </h1>
@@ -96,15 +119,51 @@ export default function Dashboard() {
         <p className="mt-2 text-muted-foreground">
           Manage your tournaments, teams and competitions.
         </p>
+
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        <StatCard title="Tournaments" value={stats.tournaments} icon={Trophy} iconClassName="text-yellow-500" />
-        <StatCard title="Active" value={stats.active} icon={Activity} iconClassName="text-green-500" />
-        <StatCard title="Finished" value={stats.finished} icon={CalendarDays} iconClassName="text-blue-500" />
-        <StatCard title="Teams" value={stats.teams} icon={Users} iconClassName="text-purple-500" />
-        <StatCard title="Players" value={stats.players} icon={User} iconClassName="text-cyan-500" />
-        <StatCard title="Matches" value={stats.matches} icon={Swords} iconClassName="text-red-500" />
+<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          title="Tournaments"
+          value={stats.tournaments}
+          icon={Trophy}
+          iconClassName="text-yellow-500"
+        />
+
+        <StatCard
+          title="Active"
+          value={stats.active}
+          icon={Activity}
+          iconClassName="text-green-500"
+        />
+
+        <StatCard
+          title="Finished"
+          value={stats.finished}
+          icon={CalendarDays}
+          iconClassName="text-blue-500"
+        />
+
+        <StatCard
+          title="Teams"
+          value={stats.teams}
+          icon={Users}
+          iconClassName="text-purple-500"
+        />
+
+        <StatCard
+          title="Players"
+          value={stats.players}
+          icon={User}
+          iconClassName="text-cyan-500"
+        />
+
+        <StatCard
+          title="Matches"
+          value={stats.matches}
+          icon={Swords}
+          iconClassName="text-red-500"
+        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -134,6 +193,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
     </div>
   );
 }

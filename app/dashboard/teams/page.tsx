@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Plus, Shield } from "lucide-react";
+
 import { supabase } from "@/lib/supabase";
-import { TeamService } from "@/services/team.service";
 import { Team } from "@/lib/types";
+import { TeamService } from "@/services/team.service";
+
 import TeamCard from "@/components/teams/TeamCard";
 
 export default function TeamsPage() {
@@ -12,7 +15,7 @@ export default function TeamsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadTeams();
+    void loadTeams();
   }, []);
 
   async function loadTeams() {
@@ -23,11 +26,7 @@ export default function TeamsPage() {
 
       if (!user) return;
 
-      const data = await TeamService.getAll(user.id);
-
-      setTeams(data);
-    } catch (error) {
-      console.error(error);
+      setTeams(await TeamService.getAll(user.id));
     } finally {
       setLoading(false);
     }
@@ -36,58 +35,53 @@ export default function TeamsPage() {
   return (
     <div className="space-y-8">
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap items-center justify-between gap-4">
 
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-5xl font-black text-transparent">
             Teams
           </h1>
 
-          <p className="text-muted-foreground">
-            Manage all your teams
+          <p className="mt-2 text-gray-400">
+            Manage your organizations.
           </p>
         </div>
 
         <Link
           href="/dashboard/teams/create"
-          className="bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-lg"
+          className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-semibold transition hover:scale-[1.02]"
         >
-          + New Team
+          <Plus className="h-5 w-5" />
+          New Team
         </Link>
 
       </div>
 
       {loading ? (
-
-        <p>Loading...</p>
-
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+          Loading teams...
+        </div>
       ) : teams.length === 0 ? (
-
-        <div className="border rounded-xl p-10 text-center">
+        <div className="rounded-3xl border border-dashed border-white/10 bg-white/5 p-10 text-center backdrop-blur-xl">
+          <Shield className="mx-auto mb-4 h-12 w-12 text-cyan-400" />
 
           <h2 className="text-2xl font-bold">
             No teams yet
           </h2>
 
-          <p className="text-muted-foreground mt-2">
+          <p className="mt-2 text-gray-400">
             Create your first team.
           </p>
-
         </div>
-
       ) : (
-
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {teams.map((team) => (
             <TeamCard
               key={team.id}
               team={team}
             />
           ))}
-
         </div>
-
       )}
 
     </div>

@@ -1,0 +1,747 @@
+]633;E;for f in ./features/tournaments/components/*.tsx\x3b do   echo ""\x3b   echo "=============================="\x3b   echo "$f"\x3b   echo "=============================="\x3b   sed -n '1,80p' "$f"\x3b done > tournament-components.txt;9b3fccc7-aa08-47a5-81af-88f2b86de72c]633;C
+==============================
+./features/tournaments/components/EnterResultsPage.tsx
+==============================
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { Match } from "@/lib/types";
+import { MatchService } from "@/services/match.service";
+import { TeamService } from "@/services/team.service";
+
+type Props = {
+  tournamentId: number;
+};
+
+type TeamMap = Record<
+  number,
+  {
+    id: number;
+    name: string;
+    logo_url: string | null;
+  }
+>;
+
+export default function EnterResultsPage({
+  tournamentId,
+}: Props) {
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [teams, setTeams] = useState<TeamMap>({});
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    load();
+  }, [tournamentId]);
+
+  async function load() {
+    try {
+      setLoading(true);
+
+      const data =
+        await MatchService.getByTournament(
+          tournamentId
+        );
+
+      setMatches(data);
+
+      const ids = [
+        ...new Set(
+          data.flatMap((m) => [
+            m.home_team_id,
+            m.away_team_id,
+          ])
+        ),
+      ];
+
+      const names =
+        await TeamService.getNames(ids);
+
+      const map: TeamMap = {};
+
+      ids.forEach((id) => {
+        map[id] = {
+          id,
+          name: names[id] ?? `Team ${id}`,
+          logo_url: null,
+        };
+      });
+
+      setTeams(map);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function updateScore(
+    matchId: number,
+    field: "home_score" | "away_score",
+
+==============================
+./features/tournaments/components/GenerateFixturesButton.tsx
+==============================
+"use client";
+
+import { useState } from "react";
+
+import { supabase } from "@/lib/supabase";
+import { MatchService } from "@/services/match.service";
+
+import { Button } from "@/components/ui/button";
+
+interface Props {
+  tournamentId: number;
+  onGenerated?: () => void;
+}
+
+export default function GenerateFixturesButton({
+  tournamentId,
+  onGenerated,
+}: Props) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleGenerate() {
+    const confirmed = window.confirm(
+      "Generate fixtures for this tournament?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+
+      // Evita generar fixtures duplicados
+      const { count, error } = await supabase
+        .from("matches")
+        .select("*", {
+          count: "exact",
+          head: true,
+        })
+        .eq("tournament_id", tournamentId);
+
+      if (error) throw error;
+
+      if ((count ?? 0) > 0) {
+        alert("Fixtures have already been generated.");
+        return;
+      }
+
+      await MatchService.generateRoundRobin(
+        tournamentId
+      );
+
+      onGenerated?.();
+
+      alert("Fixtures generated successfully.");
+    } catch (error) {
+      console.error(error);
+      alert("Unable to generate fixtures.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Button
+      onClick={handleGenerate}
+      disabled={loading}
+    >
+      {loading
+        ? "Generating..."
+        : "Generate Fixtures"}
+    </Button>
+  );
+}
+==============================
+./features/tournaments/components/RegisterTeamDialog.tsx
+==============================
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { supabase } from "@/lib/supabase";
+import { Team } from "@/lib/types";
+
+import { TournamentService } from "@/services/tournament.service";
+import { TeamService } from "@/services/team.service";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface Props {
+  tournamentId: number;
+  onRegistered?: () => void;
+}
+
+export default function RegisterTeamDialog({
+  tournamentId,
+  onRegistered,
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [teamId, setTeamId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      loadTeams();
+    }
+  }, [open]);
+
+  async function loadTeams() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const myTeams = await TeamService.getAll(user.id);
+
+    const registered =
+      await TournamentService.getRegisteredTeams(
+        tournamentId
+      );
+
+    const registeredIds = new Set(
+      registered.map((team) => team.id)
+    );
+
+    setTeams(
+      myTeams.filter(
+        (team) => !registeredIds.has(team.id)
+      )
+    );
+  }
+
+  async function handleRegister() {
+    if (!teamId) return;
+
+    try {
+      setLoading(true);
+
+      await TournamentService.registerTeam(
+        tournamentId,
+
+==============================
+./features/tournaments/components/RegisteredTeamsList.tsx
+==============================
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+import { Team } from "@/lib/types";
+import { TournamentService } from "@/services/tournament.service";
+
+interface Props {
+  tournamentId: number;
+}
+
+export default function RegisteredTeamsList({
+  tournamentId,
+}: Props) {
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    void loadTeams();
+  }, [tournamentId]);
+
+  async function loadTeams() {
+    try {
+      setLoading(true);
+
+      const data =
+        await TournamentService.getRegisteredTeams(
+          tournamentId
+        );
+
+      setTeams(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-10">
+        <p className="text-sm text-gray-400 animate-pulse">
+          Loading teams...
+        </p>
+      </div>
+    );
+  }
+
+  if (!teams.length) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center backdrop-blur-xl">
+        <p className="text-gray-400">
+          No teams registered yet.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {teams.map((team) => (
+        <Link
+          key={team.id}
+          href={`/teams/${team.id}`}
+          className="group"
+        >
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10">
+            <div className="flex items-center gap-4">
+              {team.logo_url ? (
+                <Image
+                  src={team.logo_url}
+                  alt={team.name}
+                  width={72}
+                  height={72}
+                  className="h-16 w-16 rounded-full border-2 border-white/10 object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-xl font-bold text-white">
+
+==============================
+./features/tournaments/components/TournamentDetail.tsx
+==============================
+"use client";
+
+import { useRouter } from "next/navigation";
+import {
+  BarChart3,
+  Settings,
+  Shield,
+  Swords,
+  Trophy,
+  Users,
+} from "lucide-react";
+
+interface Props {
+  tournamentId: number;
+  canManage?: boolean;
+}
+
+export default function TournamentDetail({
+  tournamentId,
+  canManage = false,
+}: Props) {
+  const router = useRouter();
+
+  const actions = [
+    {
+      title: "Matches",
+      description: "View fixtures and results",
+      icon: Swords,
+      href: `/dashboard/tournaments/${tournamentId}/matches`,
+      color:
+        "from-red-500/20 to-red-500/5 border-red-500/20 hover:border-red-400/40",
+    },
+    {
+      title: "Standings",
+      description: "League table",
+      icon: Trophy,
+      href: `/dashboard/tournaments/${tournamentId}/standings`,
+      color:
+        "from-yellow-500/20 to-yellow-500/5 border-yellow-500/20 hover:border-yellow-400/40",
+    },
+    {
+      title: "Teams",
+      description: "Registered teams",
+      icon: Users,
+      href: `/dashboard/tournaments/${tournamentId}/teams`,
+      color:
+        "from-cyan-500/20 to-cyan-500/5 border-cyan-500/20 hover:border-cyan-400/40",
+    },
+    {
+      title: "Analytics",
+      description: "Tournament insights",
+      icon: BarChart3,
+      href: `/dashboard/tournaments/${tournamentId}/analytics`,
+      color:
+        "from-purple-500/20 to-purple-500/5 border-purple-500/20 hover:border-purple-400/40",
+    },
+  ];
+
+  if (canManage) {
+    actions.push(
+      {
+        title: "Admins",
+        description: "Tournament administrators",
+        icon: Shield,
+        href: `/dashboard/tournaments/${tournamentId}/admins`,
+        color:
+          "from-green-500/20 to-green-500/5 border-green-500/20 hover:border-green-400/40",
+      },
+      {
+        title: "Settings",
+        description: "Tournament configuration",
+        icon: Settings,
+        href: `/dashboard/tournaments/${tournamentId}/settings`,
+        color:
+          "from-slate-500/20 to-slate-500/5 border-slate-500/20 hover:border-white/30",
+      }
+    );
+  }
+
+  return (
+
+==============================
+./features/tournaments/components/TournamentHeader.tsx
+==============================
+"use client";
+
+import {
+  CalendarDays,
+  Shield,
+  Trophy,
+  Users,
+} from "lucide-react";
+
+import { Tournament } from "@/lib/types";
+
+interface Props {
+  tournament: Tournament;
+  registeredTeams?: number;
+}
+
+export default function TournamentHeader({
+  tournament,
+  registeredTeams = 0,
+}: Props) {
+  function badgeColor() {
+    switch (tournament.status) {
+      case "Active":
+        return "bg-green-500/10 text-green-400 border-green-500/20";
+
+      case "Finished":
+        return "bg-gray-500/10 text-gray-300 border-gray-500/20";
+
+      default:
+        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+    }
+  }
+
+  return (
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+
+      <div className="relative h-64 bg-gradient-to-r from-cyan-600 via-blue-700 to-indigo-900">
+
+        <div className="absolute inset-0 bg-black/30" />
+
+        <div className="absolute inset-0 flex items-end justify-between p-10">
+
+          <div>
+
+            <span
+              className={`rounded-full border px-4 py-2 text-sm font-semibold ${badgeColor()}`}
+            >
+              {tournament.status}
+            </span>
+
+            <h1 className="mt-5 text-5xl font-black text-white">
+              {tournament.name}
+            </h1>
+
+            <div className="mt-5 flex flex-wrap gap-6 text-cyan-100">
+
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                {tournament.sport}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5" />
+                {tournament.format}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5" />
+                Tournament
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className="hidden rounded-3xl border border-white/10 bg-white/10 p-8 backdrop-blur-xl lg:block">
+
+            <Users className="mx-auto mb-3 h-10 w-10 text-cyan-300" />
+
+            <p className="text-center text-sm text-cyan-100">
+
+==============================
+./features/tournaments/components/TournamentMatchesList.tsx
+==============================
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { supabase } from "@/lib/supabase";
+import { Match } from "@/lib/types";
+import { MatchService } from "@/services/match.service";
+
+interface Props {
+  tournamentId: number;
+}
+
+type TeamMap = Record<
+  number,
+  {
+    name: string;
+    logo_url: string | null;
+  }
+>;
+
+export default function TournamentMatchesList({
+  tournamentId,
+}: Props) {
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [teams, setTeams] = useState<TeamMap>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    void loadMatches();
+  }, [tournamentId]);
+
+  async function loadMatches() {
+    try {
+      setLoading(true);
+
+      const data = await MatchService.getByTournament(
+        tournamentId
+      );
+
+      setMatches(data);
+
+      const ids = [
+        ...new Set(
+          data.flatMap((m) => [
+            m.home_team_id,
+            m.away_team_id,
+          ])
+        ),
+      ];
+
+      if (!ids.length) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: teamsData, error } = await supabase
+        .from("teams")
+        .select("id,name,logo_url")
+        .in("id", ids);
+
+      if (error) throw error;
+
+      const map: TeamMap = {};
+
+      teamsData?.forEach((team) => {
+        map[team.id] = {
+          name: team.name,
+          logo_url: team.logo_url,
+        };
+      });
+
+      setTeams(map);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+
+==============================
+./features/tournaments/components/TournamentQuickActions.tsx
+==============================
+"use client";
+
+import Link from "next/link";
+import {
+  Activity,
+  BarChart3,
+  CalendarDays,
+  Settings,
+  ShieldCheck,
+  Swords,
+  Trophy,
+  Users,
+} from "lucide-react";
+
+interface Props {
+  tournamentId: number;
+  teams: number;
+  matches: number;
+  activeMatches: number;
+  completedMatches: number;
+  canManage?: boolean;
+}
+
+export default function TournamentQuickActions({
+  tournamentId,
+  teams,
+  matches,
+  activeMatches,
+  completedMatches,
+  canManage = false,
+}: Props) {
+  const stats = [
+    {
+      title: "Registered Teams",
+      value: teams,
+      icon: Users,
+      color: "text-cyan-400",
+      bg: "from-cyan-500/20 to-cyan-500/5",
+    },
+    {
+      title: "Matches",
+      value: matches,
+      icon: Swords,
+      color: "text-rose-400",
+      bg: "from-rose-500/20 to-rose-500/5",
+    },
+    {
+      title: "Live",
+      value: activeMatches,
+      icon: Activity,
+      color: "text-emerald-400",
+      bg: "from-emerald-500/20 to-emerald-500/5",
+    },
+    {
+      title: "Completed",
+      value: completedMatches,
+      icon: Trophy,
+      color: "text-yellow-400",
+      bg: "from-yellow-500/20 to-yellow-500/5",
+    },
+  ];
+
+  const actions = [
+    {
+      title: "Matches",
+      href: `/dashboard/tournaments/${tournamentId}/results`,
+      icon: CalendarDays,
+    },
+    {
+      title: "Standings",
+      href: "/dashboard/standings",
+      icon: BarChart3,
+    },
+    ...(canManage
+      ? [
+          {
+            title: "Manage",
+            href: `/dashboard/tournaments/${tournamentId}`,
+            icon: Settings,
+          },
+
+==============================
+./features/tournaments/components/TournamentStats.tsx
+==============================
+"use client";
+
+import {
+  Trophy,
+  Users,
+  Swords,
+  Activity,
+} from "lucide-react";
+
+interface Props {
+  teams: number;
+  matches: number;
+  activeMatches: number;
+  completedMatches: number;
+}
+
+export default function TournamentStats({
+  teams,
+  matches,
+  activeMatches,
+  completedMatches,
+}: Props) {
+  const stats = [
+    {
+      title: "Registered Teams",
+      value: teams,
+      icon: Users,
+      color: "text-cyan-400",
+      bg: "bg-cyan-500/10",
+    },
+    {
+      title: "Matches",
+      value: matches,
+      icon: Swords,
+      color: "text-red-400",
+      bg: "bg-red-500/10",
+    },
+    {
+      title: "Active",
+      value: activeMatches,
+      icon: Activity,
+      color: "text-green-400",
+      bg: "bg-green-500/10",
+    },
+    {
+      title: "Completed",
+      value: completedMatches,
+      icon: Trophy,
+      color: "text-yellow-400",
+      bg: "bg-yellow-500/10",
+    },
+  ];
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      {stats.map((stat) => {
+        const Icon = stat.icon;
+
+        return (
+          <div
+            key={stat.title}
+            className="group rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-xl hover:shadow-cyan-500/10"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  {stat.title}
+                </p>
+
+                <h2 className="mt-3 text-4xl font-black">
+                  {stat.value}
+                </h2>
+              </div>
+
+              <div
+                className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.bg}`}
+              >
+                <Icon
+                  className={`h-7 w-7 ${stat.color}`}
+                />
