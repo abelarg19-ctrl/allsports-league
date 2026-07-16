@@ -32,23 +32,29 @@ export default function DashboardUpcomingSection({
   finishedTournaments,
 }: Props) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <UpcomingMatches
-        matches={matches}
-        teamMap={teamMap}
-      />
+    <section className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2 lg:gap-6">
+      <div className="min-w-0">
+        <UpcomingMatches
+          matches={matches}
+          teamMap={teamMap}
+        />
+      </div>
 
-      <DashboardLatestResults
-  matches={latestResults}
-  teamMap={teamMap}
-/>
+      <div className="min-w-0">
+        <DashboardLatestResults
+          matches={latestResults}
+          teamMap={teamMap}
+        />
+      </div>
 
-      <DashboardRecentActivity
-        tournaments={tournaments}
-        teams={teams}
-        matches={totalMatches}
-        finishedMatches={finishedTournaments}
-      />
-    </div>
+      <div className="min-w-0 lg:col-span-2">
+        <DashboardRecentActivity
+          tournaments={tournaments}
+          teams={teams}
+          matches={totalMatches}
+          finishedMatches={finishedTournaments}
+        />
+      </div>
+    </section>
   );
 }
