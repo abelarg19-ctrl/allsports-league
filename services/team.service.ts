@@ -140,7 +140,9 @@ export class TeamService {
     }
 
     return map;
-  }  static async create(
+  }
+
+  static async create(
     team: Omit<Team, "id" | "created_at">
   ): Promise<Team> {
     const alreadyExists = await this.exists(
@@ -149,7 +151,9 @@ export class TeamService {
     );
 
     if (alreadyExists) {
-      throw new Error("A team with this name already exists.");
+      throw new Error(
+        "A team with this name already exists."
+      );
     }
 
     const { data, error } = await supabase

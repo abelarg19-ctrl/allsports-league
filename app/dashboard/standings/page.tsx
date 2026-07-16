@@ -1,206 +1,284 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Activity,
-  CalendarDays,
-  Swords,
-  Trophy,
-  Users,
-  User,
-} from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
-import { Match } from "@/lib/types";
+import {
+  Standing,
+  Tournament,
+} from "@/lib/types";
 
 import { TournamentService } from "@/services/tournament.service";
-import { TeamService } from "@/services/team.service";
 import { MatchService } from "@/services/match.service";
-import { PlayerService } from "@/services/player.service";
+import { StandingService } from "@/services/standing.service";
 
-import StatCard from "@/features/dashboard/components/StatCard";
-import UpcomingMatches from "@/features/dashboard/components/UpcomingMatches";
-import LatestResults from "@/features/dashboard/components/LatestResults";
-import RecentActivity from "@/features/dashboard/components/RecentActivity";
+export default function StandingsPage() {
+  const [tournaments, setTournaments] =
+    useState<Tournament[]>([]);
 
-export default function Dashboard() {
-  const [stats, setStats] = useState({
-    tournaments: 0,
-    active: 0,
-    finished: 0,
-    teams: 0,
-    players: 0,
-    matches: 0,
-  });
+  const [selectedTournamentId, setSelectedTournamentId] =
+    useState<number | null>(null);
 
-  const [userName, setUserName] = useState("Player");
+  const [standings, setStandings] =
+    useState<Standing[]>([]);
 
-  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
-  const [latestResults, setLatestResults] = useState<Match[]>([]);
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    void loadDashboard();
+    void loadTournaments();
   }, []);
 
-  async function loadDashboard() {
+  useEffect(() => {
+    if (selectedTournamentId === null) {
+      setStandings([]);
+      return;
+    }
+
+    void loadStandings(selectedTournamentId);
+  }, [selectedTournamentId]);
+
+  async function loadTournaments() {
     try {
+      setLoading(true);
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) return;
-
-      setUserName(user.email?.split("@")[0] ?? "Player");
-
-      const tournaments =
-  await TournamentService.getAccessibleTournaments(user.id);
-
-      const [teams, players] = await Promise.all([
-        TeamService.getCount(user.id),
-        PlayerService.getCount(user.id),
-      ]);
-
-      let totalMatches = 0;
-
-      const upcoming: Match[] = [];
-      const finished: Match[] = [];
-
-      for (const tournament of tournaments) {
-        const matches =
-          await MatchService.getByTournament(
-            tournament.id
-          );
-
-        totalMatches += matches.length;
-
-        if (upcoming.length < 5) {
-          const pending =
-            await MatchService.getUpcomingByTournament(
-              tournament.id,
-              5 - upcoming.length
-            );
-
-          upcoming.push(...pending);
-        }
-
-        if (finished.length < 5) {
-          const recent =
-            await MatchService.getRecentResultsByTournament(
-              tournament.id,
-              5 - finished.length
-            );
-
-          finished.push(...recent);
-        }
+      if (!user) {
+        return;
       }
 
-      setUpcomingMatches(upcoming);
-      setLatestResults(finished);
+      const accessibleTournaments =
+        await TournamentService.getAccessibleTournaments(
+          user.id
+        );
 
-      setStats({
-        tournaments: tournaments.length,
-        active: tournaments.filter(
-          (t) => t.status === "Active"
-        ).length,
-        finished: tournaments.filter(
-          (t) => t.status === "Finished"
-        ).length,
-        teams,
-        players,
-        matches: totalMatches,
-      });
+      setTournaments(accessibleTournaments);
+
+      if (accessibleTournaments.length > 0) {
+        setSelectedTournamentId(
+          accessibleTournaments[0].id
+        );
+      }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
-  }  return (
+  }
+
+  async function loadStandings(
+    tournamentId: number
+  ) {
+    try {
+      setLoading(true);
+
+      const [matches, teams] =
+        await Promise.all([
+          MatchService.getByTournament(
+            tournamentId
+          ),
+          TournamentService.getRegisteredTeams(
+            tournamentId
+          ),
+        ]);
+
+      const table =
+        StandingService.calculate(
+          matches,
+          teams
+        );
+
+      setStandings(table);
+    } catch (error) {
+      console.error(error);
+      setStandings([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
     <div className="space-y-8">
       <div>
         <h1 className="text-4xl font-bold">
-          Welcome back, {userName} 👋
+          Standings
         </h1>
 
         <p className="mt-2 text-muted-foreground">
-          Manage your tournaments, teams and competitions.
+          View tournament rankings and team performance.
         </p>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        <StatCard
-          title="Tournaments"
-          value={stats.tournaments}
-          icon={Trophy}
-          iconClassName="text-yellow-500"
-        />
+      {tournaments.length > 0 && (
+        <div className="max-w-sm">
+          <label className="mb-2 block text-sm font-medium">
+            Tournament
+          </label>
 
-        <StatCard
-          title="Active"
-          value={stats.active}
-          icon={Activity}
-          iconClassName="text-green-500"
-        />
-
-        <StatCard
-          title="Finished"
-          value={stats.finished}
-          icon={CalendarDays}
-          iconClassName="text-blue-500"
-        />
-
-        <StatCard
-          title="Teams"
-          value={stats.teams}
-          icon={Users}
-          iconClassName="text-purple-500"
-        />
-
-        <StatCard
-          title="Players"
-          value={stats.players}
-          icon={User}
-          iconClassName="text-cyan-500"
-        />
-
-        <StatCard
-          title="Matches"
-          value={stats.matches}
-          icon={Swords}
-          iconClassName="text-red-500"
-        />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <UpcomingMatches matches={upcomingMatches} />
-
-        <LatestResults matches={latestResults} />
-
-        <div className="lg:col-span-2">
-          <RecentActivity
-            items={[
-              {
-                id: 1,
-                icon: "tournament",
-                title: `${stats.tournaments} Tournament(s)`,
-                description:
-                  "Total tournaments created.",
-              },
-              {
-                id: 2,
-                icon: "team",
-                title: `${stats.teams} Team(s)`,
-                description:
-                  "Registered across your tournaments.",
-              },
-              {
-                id: 3,
-                icon: "match",
-                title: `${stats.matches} Match(es)`,
-                description:
-                  "Fixtures generated so far.",
-              },
-            ]}
-          />
+          <select
+            value={
+              selectedTournamentId ?? ""
+            }
+            onChange={(event) =>
+              setSelectedTournamentId(
+                Number(event.target.value)
+              )
+            }
+            className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none"
+          >
+            {tournaments.map(
+              (tournament) => (
+                <option
+                  key={tournament.id}
+                  value={tournament.id}
+                >
+                  {tournament.name}
+                </option>
+              )
+            )}
+          </select>
         </div>
-      </div>
+      )}
+
+      {loading ? (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+          Loading standings...
+        </div>
+      ) : tournaments.length === 0 ? (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-muted-foreground">
+          No tournaments available.
+        </div>
+      ) : standings.length === 0 ? (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-muted-foreground">
+          No standings available yet.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-3xl border border-white/10 bg-white/5">
+          <table className="w-full min-w-[800px]">
+            <thead className="border-b border-white/10 text-left text-sm text-muted-foreground">
+              <tr>
+                <th className="p-4">
+                  #
+                </th>
+
+                <th className="p-4">
+                  Team
+                </th>
+
+                <th className="p-4 text-center">
+                  P
+                </th>
+
+                <th className="p-4 text-center">
+                  W
+                </th>
+
+                <th className="p-4 text-center">
+                  D
+                </th>
+
+                <th className="p-4 text-center">
+                  L
+                </th>
+
+                <th className="p-4 text-center">
+                  GF
+                </th>
+
+                <th className="p-4 text-center">
+                  GA
+                </th>
+
+                <th className="p-4 text-center">
+                  GD
+                </th>
+
+                <th className="p-4 text-center">
+                  PTS
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {standings.map(
+                (standing, index) => (
+                  <tr
+                    key={standing.team_id}
+                    className="border-b border-white/5 last:border-0"
+                  >
+                    <td className="p-4 font-bold">
+                      {index + 1}
+                    </td>
+
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        {standing.logo_url ? (
+                          <img
+                            src={
+                              standing.logo_url
+                            }
+                            alt={
+                              standing.team_name
+                            }
+                            className="h-10 w-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-white/10" />
+                        )}
+
+                        <span className="font-semibold">
+                          {
+                            standing.team_name
+                          }
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {standing.played}
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {standing.wins}
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {standing.draws}
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {standing.losses}
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {standing.goals_for}
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {
+                        standing.goals_against
+                      }
+                    </td>
+
+                    <td className="p-4 text-center">
+                      {
+                        standing.goal_difference
+                      }
+                    </td>
+
+                    <td className="p-4 text-center font-bold">
+                      {standing.points}
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

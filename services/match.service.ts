@@ -4,6 +4,30 @@ import { Match } from "@/lib/types";
 import { TournamentService } from "@/services/tournament.service";
 
 export class MatchService {
+  static async getCountByTournaments(
+    tournamentIds: number[]
+  ): Promise<number> {
+    if (tournamentIds.length === 0) {
+      return 0;
+    }
+
+    const { count, error } = await supabase
+      .from("matches")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .in("tournament_id", tournamentIds);
+
+    if (error) {
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
+    }
+
+    return count ?? 0;
+  }
+
   static async getByTournament(
     tournamentId: number
   ): Promise<Match[]> {
@@ -73,6 +97,47 @@ export class MatchService {
     return (data ?? []) as Match[];
   }
 
+  static async getUpcoming(
+    tournamentIds: number[],
+    limit = 5
+  ): Promise<Match[]> {
+    if (tournamentIds.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from("matches")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
+      .in("tournament_id", tournamentIds)
+      .eq("status", "Pending")
+      .order("starts_at", {
+        ascending: true,
+        nullsFirst: false,
+      })
+      .order("id", {
+        ascending: true,
+      })
+      .limit(limit);
+
+    if (error) {
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
+    }
+
+    return (data ?? []) as Match[];
+  }
+
   static async getRecentResultsByTournament(
     tournamentId: number,
     limit = 5
@@ -91,6 +156,43 @@ export class MatchService {
         starts_at
       `)
       .eq("tournament_id", tournamentId)
+      .eq("status", "Finished")
+      .order("id", {
+        ascending: false,
+      })
+      .limit(limit);
+
+    if (error) {
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
+    }
+
+    return (data ?? []) as Match[];
+  }
+
+  static async getRecentResults(
+    tournamentIds: number[],
+    limit = 5
+  ): Promise<Match[]> {
+    if (tournamentIds.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from("matches")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
+      .in("tournament_id", tournamentIds)
       .eq("status", "Finished")
       .order("id", {
         ascending: false,
@@ -174,7 +276,9 @@ export class MatchService {
     }
 
     return data as Match;
-  }  static async updateResult(
+  }
+
+  static async updateResult(
     id: number,
     homeScore: number,
     awayScore: number

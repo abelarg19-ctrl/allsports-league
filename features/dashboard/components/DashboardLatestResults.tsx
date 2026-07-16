@@ -1,11 +1,10 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
-
 import { Match } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 
 type TeamInfo = {
+  id: number;
   name: string;
   logo_url: string | null;
 };
@@ -15,26 +14,20 @@ type Props = {
   teamMap: Record<number, TeamInfo>;
 };
 
-export default function UpcomingMatches({
+export default function DashboardLatestResults({
   matches,
   teamMap,
 }: Props) {
   return (
     <Card>
       <CardContent className="p-6">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="rounded-xl bg-cyan-500/10 p-2">
-            <CalendarDays className="h-5 w-5 text-cyan-400" />
-          </div>
-
-          <h2 className="text-lg font-bold">
-            Upcoming Matches
-          </h2>
-        </div>
+        <h2 className="mb-6 text-lg font-bold">
+          Latest Results
+        </h2>
 
         {matches.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No upcoming matches.
+            No results available yet.
           </p>
         ) : (
           <div className="space-y-3">
@@ -56,7 +49,7 @@ export default function UpcomingMatches({
                         <img
                           src={homeTeam.logo_url}
                           alt={homeTeam.name}
-                          className="h-10 w-10 rounded-full object-cover"
+                          className="h-10 w-10 shrink-0 rounded-full object-cover"
                         />
                       ) : (
                         <div className="h-10 w-10 shrink-0 rounded-full bg-white/10" />
@@ -68,9 +61,19 @@ export default function UpcomingMatches({
                       </span>
                     </div>
 
-                    <span className="text-xs font-bold text-muted-foreground">
-                      VS
-                    </span>
+                    <div className="flex shrink-0 items-center gap-2 text-lg font-black">
+                      <span>
+                        {match.home_score}
+                      </span>
+
+                      <span className="text-muted-foreground">
+                        -
+                      </span>
+
+                      <span>
+                        {match.away_score}
+                      </span>
+                    </div>
 
                     <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
                       <span className="truncate text-right font-semibold">
@@ -82,7 +85,7 @@ export default function UpcomingMatches({
                         <img
                           src={awayTeam.logo_url}
                           alt={awayTeam.name}
-                          className="h-10 w-10 rounded-full object-cover"
+                          className="h-10 w-10 shrink-0 rounded-full object-cover"
                         />
                       ) : (
                         <div className="h-10 w-10 shrink-0 rounded-full bg-white/10" />
@@ -90,15 +93,9 @@ export default function UpcomingMatches({
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Round {match.round}
-                    </p>
-
-                    <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-400">
-                      {match.status}
-                    </span>
-                  </div>
+                  <p className="mt-3 text-center text-xs text-muted-foreground">
+                    Round {match.round}
+                  </p>
                 </div>
               );
             })}
