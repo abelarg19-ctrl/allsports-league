@@ -53,10 +53,19 @@ export class TournamentLoaderService {
       TournamentService.getRegisteredTeams(
         tournamentId
       ),
-      TournamentService.isTournamentAdmin(
-        tournamentId,
-        userId
-      ),
+      (async () => {
+        const isSuperAdmin =
+          await TournamentService.isSuperAdmin();
+
+        if (isSuperAdmin) {
+          return true;
+        }
+
+        return TournamentService.isTournamentAdmin(
+          tournamentId,
+          userId
+        );
+      })(),
     ]);
 
     const ids = teams.map((team) => team.id);

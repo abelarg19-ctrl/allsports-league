@@ -2,6 +2,16 @@ import { supabase } from "@/lib/supabase";
 import { Team, Tournament } from "@/lib/types";
 
 export class TournamentService {
+  static async isSuperAdmin(): Promise<boolean> {
+    const { data, error } = await supabase.rpc(
+      "is_super_admin"
+    );
+
+    if (error) throw error;
+
+    return data === true;
+  }
+
   static async getAll(
     userId: string
   ): Promise<Tournament[]> {

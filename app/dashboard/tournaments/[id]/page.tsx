@@ -6,6 +6,9 @@ import { supabase } from "@/lib/supabase";
 
 import TournamentDetail from "@/features/tournaments/components/TournamentDetail";
 import TournamentMatchesList from "@/features/tournaments/components/TournamentMatchesList";
+import RegisterTeamDialog from "@/features/tournaments/components/RegisterTeamDialog";
+import GenerateFixturesButton from "@/features/tournaments/components/GenerateFixturesButton";
+import RegisteredTeamsList from "@/features/tournaments/components/RegisteredTeamsList";
 
 import {
   TournamentLoaderService,
@@ -82,6 +85,36 @@ export default function TournamentPage({
         overview={data.overview}
         canManage={data.canManage}
       />
+
+      <section className="space-y-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-white">
+              Regis              R         </h2>
+            <p className="mt-1 text-sm text-gray-400">
+              Teams participating in this tournament.
+            </p>
+          </div>
+
+          {data.canManage && (
+            <div className="flex flex-wrap gap-3">
+              <RegisterTeamDialog
+                tournamentId={data.tournament.id}
+                onRegistered={loadTournament}
+              />
+
+              <GenerateFixturesButton
+                tournamentId={data.tournament.id}
+                onGenerated={loadTournament}
+              />
+            </div>
+          )}
+        </div>
+
+        <RegisteredTeamsList
+          tournamentId={data.tournament.id}
+        />
+      </section>
 
       <TournamentMatchesList
         matches={data.matches}
