@@ -1,11 +1,17 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Activity,
   CalendarDays,
   ChevronRight,
   MessageSquareText,
+  ShieldCheck,
   Users,
 } from "lucide-react";
+
+import { supabase } from "@/lib/supabase";
 
 const options = [
   {
@@ -35,6 +41,42 @@ const options = [
 ];
 
 export default function MorePage() {
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    void checkSuperAdmin();
+  }, []);
+
+  async function checkSuperAdmin() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return;
+    }
+
+    const { data } = await supabase
+      .from("super_admins")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    setIsSuperAdmin(Boolean(data));
+  }
+
+  const visibleOptions = isSuperAdmin
+    ? [
+        ...options,
+        {
+          href: "/dashboard/admin/feedback",
+          title: "Beta Feedback",
+          description: "Review feedback submitted by beta testers.",
+          icon: ShieldCheck,
+        },
+      ]
+    : options;
+
   return (
     <div className="space-y-6">
       <div>
@@ -48,7 +90,7 @@ export default function MorePage() {
       </div>
 
       <div className="space-y-3">
-        {options.map((option) => {
+        {visibleOptions.map((option) => {
           const Icon = option.icon;
 
           return (

@@ -84,11 +84,11 @@ export default function TournamentsPage() {
               href={`/dashboard/tournaments/${tournament.id}`}
               className="group rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:rounded-3xl sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10"
             >
-              <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
-                <div>
+                <div className="min-w-0 flex-1">
 
-                  <h2 className="text-lg font-bold sm:text-xl lg:text-2xl">
+                  <h2 className="break-words text-xl font-bold leading-tight sm:text-2xl">
                     {tournament.name}
                   </h2>
 

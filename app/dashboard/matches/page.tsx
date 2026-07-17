@@ -124,11 +124,11 @@ export default function MatchesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
 
       <div>
 
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-black sm:text-4xl">
           Matches
         </h1>
 
@@ -139,7 +139,7 @@ export default function MatchesPage() {
       </div>      {loading ? (
         <p>Loading...</p>
       ) : matches.length === 0 ? (
-        <div className="rounded-xl border p-8">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-xl sm:p-8">
           No matches generated.
         </div>
       ) : (
@@ -147,7 +147,7 @@ export default function MatchesPage() {
           {matches.map((match) => (
             <div
               key={match.id}
-              className="rounded-xl border p-5"
+              className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="flex items-center justify-between">
 
@@ -183,16 +183,16 @@ export default function MatchesPage() {
 
               </div>
 
-              <div className="mt-6 flex items-center justify-between">
+              <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-white/10 pt-5 sm:mt-6 sm:gap-4">
 
-                <div className="flex w-2/5 items-center gap-3">
+                <div className="flex min-w-0 flex-col items-center gap-2 sm:flex-row sm:gap-3">
 
                   <img
                     src={
                       teams[match.home_team_id]?.logo_url ??
                       "/team-placeholder.png"
                     }
-                    className="h-12 w-12 rounded-full border object-cover"
+                    className="h-10 w-10 shrink-0 rounded-full border object-cover sm:h-12 sm:w-12"
                     alt=""
                   />
 
@@ -215,7 +215,7 @@ export default function MatchesPage() {
 
                 </div>
 
-                <div className="flex w-2/5 items-center justify-end gap-3">
+                <div className="flex min-w-0 flex-col-reverse items-center gap-2 sm:flex-row sm:justify-end sm:gap-3">
 
                   <span className="font-semibold">
                     {teams[match.away_team_id]?.name ??
@@ -227,7 +227,7 @@ export default function MatchesPage() {
                       teams[match.away_team_id]?.logo_url ??
                       "/team-placeholder.png"
                     }
-                    className="h-12 w-12 rounded-full border object-cover"
+                    className="h-10 w-10 shrink-0 rounded-full border object-cover sm:h-12 sm:w-12"
                     alt=""
                   />
 

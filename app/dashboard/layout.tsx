@@ -3,6 +3,7 @@ import {
   Activity,
   CalendarDays,
   House,
+  Menu,
   Plus,
   Shield,
   Trophy,
@@ -39,6 +40,11 @@ const links = [
     href: "/dashboard/standings",
     label: "Standings",
     icon: CalendarDays,
+  },
+  {
+    href: "/dashboard/more",
+    label: "More",
+    icon: Menu,
   },
 ];
 
@@ -132,7 +138,7 @@ export default function DashboardLayout({
             href="/dashboard/more"
             className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-gray-400 transition hover:bg-white/5 hover:text-cyan-400"
           >
-            <Users className="h-5 w-5" />
+            <Menu className="h-5 w-5" />
             <span className="text-[10px] font-medium">
               More
             </span>
