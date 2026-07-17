@@ -1,5 +1,4 @@
 import Link from "next/link";
-import FloatingLogoutButton from "@/components/auth/FloatingLogoutButton";
 import {
   Activity,
   CalendarDays,
@@ -56,7 +55,6 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="min-h-screen text-white">
-      <FloatingLogoutButton />
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-white/10 bg-black/25 backdrop-blur-2xl lg:flex">
         <div className="border-b border-white/10 p-8">
           <h1 className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-3xl font-black text-transparent">
