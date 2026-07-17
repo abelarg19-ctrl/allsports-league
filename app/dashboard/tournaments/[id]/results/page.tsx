@@ -35,6 +35,7 @@ export default function TournamentResultsPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [canManage, setCanManage] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const [teams, setTeams] = useState<
     Record<number, TeamInfo>
@@ -119,6 +120,7 @@ export default function TournamentResultsPage() {
 
       await MatchService.finishMatch(match.id);
 
+      setEditingId(null);
       await loadMatches();
     } catch (error) {
       console.error(error);
@@ -170,9 +172,14 @@ export default function TournamentResultsPage() {
         const home = teams[match.home_team_id];
         const away = teams[match.away_team_id];
 
+        const isFinished =
+          match.status === "Finished";
+
+        const isEditing =
+          editingId === match.id;
+
         const locked =
-          match.status === "Finished" &&
-          !canManage;
+          isFinished && !isEditing;
 
         return (
           <div
@@ -265,19 +272,30 @@ export default function TournamentResultsPage() {
               </div>
             </div>
 
-            {locked ? (
+            {isFinished && !canManage ? (
               <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-300">
-                This match has been finalized. Only tournament administrators can modify it.
+                               be                       nament administrators can modify it.
               </div>
+            ) : isFinished && !isEditing ? (
+              <button
+                type="button"
+                onClick={() => setEditingId(match.id)}
+                className="mt-5 rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-5 py-3 font-semibold text-cyan-300 transition hover:bg-cyan-500/20"
+              >
+                Edit Result
+              </button>
             ) : (
               <button
+                type="button"
                 onClick={() => save(match)}
                 disabled={savingId === match.id}
                 className="mt-5 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
               >
                 {savingId === match.id
                   ? "Saving..."
-                  : "Save Result"}
+                  : isFinished
+                    ? "Save Changes"
+                    : "Save Result"}
               </button>
             )}
           </div>
