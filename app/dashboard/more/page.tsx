@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 const options = [
   {
@@ -117,6 +118,10 @@ export default function MorePage() {
             </Link>
           );
         })}
+      </div>
+
+      <div className="border-t border-white/10 pt-6">
+        <LogoutButton />
       </div>
     </div>
   );

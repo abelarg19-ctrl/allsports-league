@@ -31,15 +31,16 @@ export class TournamentService {
   static async getAccessibleTournaments(
     userId: string
   ): Promise<Tournament[]> {
-    const owned = await this.getAll(userId);
-
-    const {
-      data: adminRows,
-      error,
-    } = await supabase
-      .from("tournament_admins")
-      .select("tournament_id")
-      .eq("user_id", userId);
+    const [
+      owned,
+      { data: adminRows, error },
+    ] = await Promise.all([
+      this.getAll(userId),
+      supabase
+        .from("tournament_admins")
+        .select("tournament_id")
+        .eq("user_id", userId),
+    ]);
 
     if (error) throw error;
 
