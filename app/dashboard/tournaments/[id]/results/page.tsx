@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { Lock } from "lucide-react";
 
 import { MatchService } from "@/services/match.service";
+import { TournamentService } from "@/services/tournament.service";
+import { supabase } from "@/lib/supabase";
 import { TeamService } from "@/services/team.service";
 
 type EditableMatch = {
@@ -32,6 +34,7 @@ export default function TournamentResultsPage() {
   const [matches, setMatches] = useState<EditableMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<number | null>(null);
+  const [canManage, setCanManage] = useState(false);
 
   const [teams, setTeams] = useState<
     Record<number, TeamInfo>
@@ -47,6 +50,28 @@ export default function TournamentResultsPage() {
     setLoading(true);
 
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setCanManage(false);
+        return;
+      }
+
+      const [isSuperAdmin, isTournamentAdmin] =
+        await Promise.all([
+                     TournamentService.isSuperAdmin(),
+          TournamentService.isTournamentAdmin(
+            tournamentId,
+            user.id
+          ),
+        ]);
+
+      setCanManage(
+        isSuperAdmin || isTournamentAdmin
+      );
+
       const data = await MatchService.getByTournament(
         tournamentId
       );
@@ -76,7 +101,10 @@ export default function TournamentResultsPage() {
   }
 
   async function save(match: EditableMatch) {
-    if (match.status === "Finished") {
+    if (
+      match.status === "Finished" &&
+      !canManage
+    ) {
       return;
     }
 
@@ -143,7 +171,8 @@ export default function TournamentResultsPage() {
         const away = teams[match.away_team_id];
 
         const locked =
-          match.status === "Finished";
+          match.status === "Finished" &&
+          !canManage;
 
         return (
           <div
