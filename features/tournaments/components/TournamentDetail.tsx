@@ -74,64 +74,13 @@ export default function TournamentDetail({
   const actions: Action[] = [
     {
       title: "Matches",
-      description:
-        "Fixtures, results and Match Center",
+      description: "Fixtures, results and Match Center",
       icon: Swords,
-      href: `/dashboard/tournaments/${tournament.id}/matches`,
+      href: `/dashboard/tournaments/${tournament.id}/results`,
       color:
         "from-red-500/20 to-red-500/5 border-red-500/20 hover:border-red-400/40",
     },
-    {
-      title: "Standings",
-      description:
-        "League table and rankings",
-      icon: Trophy,
-      href: `/dashboard/tournaments/${tournament.id}/standings`,
-      color:
-        "from-yellow-500/20 to-yellow-500/5 border-yellow-500/20 hover:border-yellow-400/40",
-    },
-    {
-      title: "Teams",
-      description:
-        "Registered clubs and rosters",
-      icon: Users,
-      href: `/dashboard/tournaments/${tournament.id}/teams`,
-      color:
-        "from-cyan-500/20 to-cyan-500/5 border-cyan-500/20 hover:border-cyan-400/40",
-    },
-    {
-      title: "Analytics",
-      description:
-        "Tournament insights",
-      icon: BarChart3,
-      href: `/dashboard/tournaments/${tournament.id}/analytics`,
-      color:
-        "from-purple-500/20 to-purple-500/5 border-purple-500/20 hover:border-purple-400/40",
-    },
   ];
-
-  if (canManage) {
-    actions.push(
-      {
-        title: "Admins",
-        description:
-          "Tournament administrators",
-        icon: Shield,
-        href: `/dashboard/tournaments/${tournament.id}/admins`,
-        color:
-          "from-green-500/20 to-green-500/5 border-green-500/20 hover:border-green-400/40",
-      },
-      {
-        title: "Settings",
-        description:
-          "Tournament configuration",
-        icon: Settings,
-        href: `/dashboard/tournaments/${tournament.id}/settings`,
-        color:
-          "from-slate-500/20 to-slate-500/5 border-slate-500/20 hover:border-white/30",
-      }
-    );
-  }
 
   return (
     <section className="space-y-8">
@@ -163,7 +112,7 @@ export default function TournamentDetail({
             type="button"
             onClick={() =>
               router.push(
-                `/dashboard/tournaments/${tournament.id}/matches`
+                `/dashboard/tournaments/${tournament.id}/results`
               )
             }
             className="rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4 font-semibold text-white transition hover:scale-[1.02]"
@@ -254,101 +203,7 @@ export default function TournamentDetail({
 
       </div>
 
-      <div className="rounded-3xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-transparent p-8 backdrop-blur-xl">
 
-        <div className="flex flex-col gap-2">
-
-          <h2 className="text-2xl font-bold text-white">
-            Quick Actions
-          </h2>
-
-          <p className="max-w-3xl text-gray-400">
-            Frequently used tournament actions.
-          </p>
-
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-4">
-
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                `/dashboard/tournaments/${tournament.id}/matches`
-              )
-            }
-            className="rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-semibold text-white transition hover:scale-[1.02]"
-          >
-            Match Center
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                `/dashboard/tournaments/${tournament.id}/standings`
-              )
-            }
-            className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
-          >
-            Standings
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                `/dashboard/tournaments/${tournament.id}/teams`
-              )
-            }
-            className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
-          >
-            Teams
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              router.push(
-                `/dashboard/tournaments/${tournament.id}/analytics`
-              )
-            }
-            className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
-          >
-            Analytics
-          </button>
-
-          {canManage && (
-            <>
-              <button
-                type="button"
-                onClick={() =>
-                  router.push(
-                    `/dashboard/tournaments/${tournament.id}/admins`
-                  )
-                }
-                className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-6 py-3 font-semibold text-emerald-300 transition hover:bg-emerald-500/20"
-              >
-                Admins
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  router.push(
-                    `/dashboard/tournaments/${tournament.id}/settings`
-                  )
-                }
-                className="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 px-6 py-3 font-semibold text-cyan-300 transition hover:bg-cyan-500/20"
-              >
-                Settings
-              </button>
-            </>
-          )}
-
-        </div>
-
-      </div>
 
     </section>
   );
