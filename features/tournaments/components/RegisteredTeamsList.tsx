@@ -63,7 +63,7 @@ export default function RegisteredTeamsList({
       {teams.map((team) => (
         <Link
           key={team.id}
-          href={`/teams/${team.id}`}
+          href={`/dashboard/teams/${team.id}`}
           className="group"
         >
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10">
