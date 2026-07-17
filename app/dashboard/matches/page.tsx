@@ -55,28 +55,31 @@ export default function MatchesPage() {
      const tournaments =
   await TournamentService.getAccessibleTournaments(user.id);
 
-      const allMatches: MatchWithTournament[] = [];
+      const tournamentMatches = await Promise.all(
+        (tournaments as Tournament[]).map(
+          async (tournament) => {
+            const [list, canEdit] =
+              await Promise.all([
+                MatchService.getByTournament(
+                  tournament.id
+                ),
+                TournamentService.isTournamentAdmin(
+                  tournament.id,
+                  user.id
+                ),
+              ]);
 
-      for (const tournament of tournaments as Tournament[]) {
-        const list =
-          await MatchService.getByTournament(
-            tournament.id
-          );
+            return list.map((match) => ({
+              ...match,
+              tournamentName: tournament.name,
+              canEdit,
+            }));
+          }
+        )
+      );
 
-        const canEdit =
-          await TournamentService.isTournamentAdmin(
-            tournament.id,
-            user.id
-          );
-
-        list.forEach((match) =>
-          allMatches.push({
-            ...match,
-            tournamentName: tournament.name,
-            canEdit,
-          })
-        );
-      }
+      const allMatches: MatchWithTournament[] =
+        tournamentMatches.flat();
 
       const ids = [
         ...new Set(
