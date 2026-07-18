@@ -54,16 +54,22 @@ export class TournamentLoaderService {
         tournamentId
       ),
       (async () => {
-        const isSuperAdmin =
-          await TournamentService.isSuperAdmin();
-
-        if (isSuperAdmin) {
+        if (tournament.owner_id === userId) {
           return true;
         }
 
-        return TournamentService.isTournamentAdmin(
-          tournamentId,
-          userId
+        const [isSuperAdmin, isTournamentAdmin] =
+          await Promise.all([
+            TournamentService.isSuperAdmin(),
+            TournamentService.isTournamentAdmin(
+              tournamentId,
+              userId
+            ),
+          ]);
+
+        return (
+          isSuperAdmin ||
+          isTournamentAdmin
         );
       })(),
     ]);

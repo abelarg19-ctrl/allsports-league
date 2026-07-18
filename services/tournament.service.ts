@@ -111,25 +111,14 @@ export class TournamentService {
     tournamentId: number,
     userId: string
   ): Promise<boolean> {
-    const tournament =
-      await this.getById(
-        tournamentId,
-        userId
-      );
-
-    if (tournament) {
-      return true;
-    }
-
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("tournament_admins")
       .select("id")
-      .eq(
-        "tournament_id",
-        tournamentId
-      )
+      .eq("tournament_id", tournamentId)
       .eq("user_id", userId)
       .maybeSingle();
+
+    if (error) throw error;
 
     return !!data;
   }
