@@ -45,8 +45,10 @@ export default function Dashboard() {
 
   async function loadDashboard() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const user = session?.user;
 
     if (!user) {
       return;
