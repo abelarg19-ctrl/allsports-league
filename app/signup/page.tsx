@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function SignUpPage() {
+  const router = useRouter();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +19,6 @@ export default function SignUpPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   async function handleSignUp() {
     setError("");
@@ -60,38 +62,10 @@ export default function SignUpPage() {
       return;
     }
 
-    setSuccess(true);
+    router.replace("/dashboard");
+    router.refresh();
   }
 
-  if (success) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6">
-        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-10 text-center backdrop-blur-2xl">
-
-          <CheckCircle2 className="mx-auto h-16 w-16 text-green-400" />
-
-          <h1 className="mt-6 text-4xl font-black">
-            Check your email
-          </h1>
-
-          <p className="mt-4 text-gray-400">
-            Your account has been created successfully.
-          </p>
-
-          <p className="mt-2 text-gray-400">
-            Verify your email before signing in.
-          </p>
-
-          <Link href="/login">
-            <Button className="mt-8 w-full bg-gradient-to-r from-cyan-500 to-blue-600">
-              Back to Sign In
-            </Button>
-          </Link>
-
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6">
