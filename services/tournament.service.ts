@@ -92,6 +92,21 @@ export class TournamentService {
     );
   }
 
+  static async getAdminTournamentIds(
+    userId: string
+  ): Promise<number[]> {
+    const { data, error } = await supabase
+      .from("tournament_admins")
+      .select("tournament_id")
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    return (data ?? []).map(
+      (row) => row.tournament_id
+    );
+  }
+
   static async isTournamentAdmin(
     tournamentId: number,
     userId: string

@@ -7,6 +7,7 @@ import { Match, Tournament } from "@/lib/types";
 
 import { TournamentService } from "@/services/tournament.service";
 import { MatchService } from "@/services/match.service";
+import { TeamService } from "@/services/team.service";
 
 import { Button } from "@/components/ui/button";
 import MatchResultDialog from "@/features/matches/components/MatchResultDialog";
@@ -54,34 +55,35 @@ export default function MatchesPage() {
 
       if (!user) return;
 
-     const tournaments =
-  await TournamentService.getAccessibleTournaments(user.id);
+      const tournaments =
+        await TournamentService.getAccessibleTournaments(
+          user.id
+        );
 
-      const tournamentMatches = await Promise.all(
-        (tournaments as Tournament[]).map(
-          async (tournament) => {
-            const [list, canEdit] =
-              await Promise.all([
-                MatchService.getByTournament(
-                  tournament.id
-                ),
-                TournamentService.isTournamentAdmin(
-                  tournament.id,
-                  user.id
-                ),
-              ]);
-
-            return list.map((match) => ({
-              ...match,
-              tournamentName: tournament.name,
-              canEdit,
-            }));
-          }
-        )
+      const tournamentIds = tournaments.map(
+        (tournament) => tournament.id
       );
 
+      const tournamentMap = new Map(
+        tournaments.map((tournament) => [
+          tournament.id,
+          tournament.name,
+        ])
+      );
+
+      const matchList =
+        await MatchService.getByTournaments(
+          tournamentIds
+        );
+
       const allMatches: MatchWithTournament[] =
-        tournamentMatches.flat();
+        matchList.map((match) => ({
+          ...match,
+          tournamentName:
+            tournamentMap.get(match.tournament_id) ??
+            "Tournament",
+          canEdit: true,
+        }));
 
       const ids = [
         ...new Set(
@@ -92,19 +94,8 @@ export default function MatchesPage() {
         ),
       ];
 
-      const { data: teamsData } = await supabase
-        .from("teams")
-        .select("id,name,logo_url")
-        .in("id", ids);
-
-      const map: TeamMap = {};
-
-      teamsData?.forEach((team) => {
-        map[team.id] = {
-          name: team.name,
-          logo_url: team.logo_url,
-        };
-      });
+      const map =
+        await TeamService.getBasicInfos(ids);
 
       setTeams(map);
       setMatches(allMatches);

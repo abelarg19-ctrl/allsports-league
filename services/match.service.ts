@@ -28,6 +28,46 @@ export class MatchService {
     return count ?? 0;
   }
 
+  static async getByTournaments(
+    tournamentIds: number[]
+  ): Promise<Match[]> {
+    if (tournamentIds.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from("matches")
+      .select(`
+        id,
+        tournament_id,
+        home_team_id,
+        away_team_id,
+        home_score,
+        away_score,
+        round,
+        status,
+        starts_at
+      `)
+      .in("tournament_id", tournamentIds)
+      .order("tournament_id", {
+        ascending: true,
+      })
+      .order("round", {
+        ascending: true,
+      })
+      .order("id", {
+        ascending: true,
+      });
+
+    if (error) {
+      throw new Error(
+        getSupabaseErrorMessage(error)
+      );
+    }
+
+    return (data ?? []) as Match[];
+  }
+
   static async getByTournament(
     tournamentId: number
   ): Promise<Match[]> {
