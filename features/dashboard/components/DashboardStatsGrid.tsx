@@ -30,6 +30,7 @@ export default function DashboardStatsGrid({
       <StatCard
         title="Tournaments"
         value={stats.tournaments}
+        href="/dashboard/tournaments"
         icon={Trophy}
         iconClassName="text-yellow-500"
       />
@@ -37,6 +38,7 @@ export default function DashboardStatsGrid({
       <StatCard
         title="Active"
         value={stats.active}
+        href="/dashboard/tournaments"
         icon={Activity}
         iconClassName="text-green-500"
       />
@@ -44,6 +46,7 @@ export default function DashboardStatsGrid({
       <StatCard
         title="Finished"
         value={stats.finished}
+        href="/dashboard/tournaments"
         icon={CalendarDays}
         iconClassName="text-blue-500"
       />
@@ -51,6 +54,7 @@ export default function DashboardStatsGrid({
       <StatCard
         title="Teams"
         value={stats.teams}
+        href="/dashboard/teams"
         icon={Users}
         iconClassName="text-purple-500"
       />
@@ -58,6 +62,7 @@ export default function DashboardStatsGrid({
       <StatCard
         title="Players"
         value={stats.players}
+        href="/dashboard/players"
         icon={User}
         iconClassName="text-cyan-500"
       />
@@ -65,6 +70,7 @@ export default function DashboardStatsGrid({
       <StatCard
         title="Matches"
         value={stats.matches}
+        href="/dashboard/matches"
         icon={Swords}
         iconClassName="text-red-500"
       />

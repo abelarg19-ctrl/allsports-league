@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoutButton from "@/components/auth/LogoutButton";
 import {
   Activity,
   CalendarDays,
@@ -88,6 +89,10 @@ export default function DashboardLayout({
             </Link>
           </div>
         </nav>
+
+        <div className="border-t border-white/10 p-5">
+          <LogoutButton />
+        </div>
       </aside>
 
       <main className="min-h-screen px-4 pb-32 pt-5 sm:px-6 sm:pt-6 lg:ml-72 lg:p-10">
