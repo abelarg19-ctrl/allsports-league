@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   LucideIcon,
   TrendingDown,
@@ -19,6 +21,7 @@ type Props = {
   subtitle?: string;
   trend?: "up" | "down" | "neutral";
   badge?: string;
+  href?: string;
 };
 
 export default function StatCard({
@@ -29,9 +32,10 @@ export default function StatCard({
   subtitle,
   trend,
   badge,
+  href,
 }: Props) {
-  return (
-    <Card className="group overflow-hidden border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10">
+  const card = (
+    <Card className="group h-full overflow-hidden border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/10 hover:shadow-2xl hover:shadow-cyan-500/10">
       <CardContent className="relative p-4 sm:p-5 lg:p-6">
         <div className="absolute right-0 top-0 h-20 w-20 rounded-full bg-cyan-500/10 blur-3xl transition-all duration-300 group-hover:bg-cyan-400/20 sm:h-24 sm:w-24" />
 
@@ -92,5 +96,18 @@ export default function StatCard({
         )}
       </CardContent>
     </Card>
+  );
+
+  if (!href) {
+    return card;
+  }
+
+  return (
+    <Link
+      href={href}
+      className="block cursor-pointer"
+    >
+      {card}
+    </Link>
   );
 }
